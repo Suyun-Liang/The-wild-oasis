@@ -10,6 +10,22 @@ export async function getCabins() {
 
   return data;
 }
+export async function getCabin(id) {
+  if (!id) return;
+
+  const { data, error } = await supabase
+    .from("cabins")
+    .select()
+    .eq("id", id)
+    .single();
+
+  if (error) {
+    console.error(error);
+    throw new Error("cabin could not be loaded");
+  }
+
+  return data;
+}
 
 export async function deleteCabin(id) {
   const { data, error } = await supabase.from("cabins").delete().eq("id", id);

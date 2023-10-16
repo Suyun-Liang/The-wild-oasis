@@ -92,7 +92,11 @@ export async function getStaysTodayActivity() {
     .from("bookings")
     .select("*, guests(fullName, nationality, countryFlag)")
     .or(
-      `and(status.eq.unconfirmed,startDate.eq.${getToday()}),and(status.eq.checked-in,endDate.eq.${getToday()})`
+      `and(status.eq.unconfirmed,startDate.gte.${getToday()},startDate.lt.${getToday(
+        { end: true }
+      )}),and(status.eq.checked-in,endDate.gte.${getToday()},endDate.lt.${getToday(
+        { end: true }
+      )})`
     )
     .order("created_at");
 
@@ -104,6 +108,17 @@ export async function getStaysTodayActivity() {
     console.error(error);
     throw new Error("Bookings could not get loaded");
   }
+  return data;
+}
+
+export async function createBooking(newBookingObj) {
+  const { data, error } = await supabase
+    .from("bookings")
+    .insert(newBookingObj)
+    .select();
+
+  if (error) throw new Error(error.message);
+
   return data;
 }
 

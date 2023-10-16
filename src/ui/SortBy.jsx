@@ -10,10 +10,10 @@ function SortBy({ options }) {
   }
   return (
     <Select
+      $type="white"
       options={options}
       value={sortBy}
       onChange={handleChange}
-      $type="white"
     />
   );
 }
