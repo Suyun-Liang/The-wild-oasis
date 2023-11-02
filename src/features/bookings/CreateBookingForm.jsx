@@ -14,12 +14,14 @@ import useCreateGuest from "./useCreateGuest";
 import {
   getISOSNow,
   subtractDates,
-  isLaterThanNow,
+  isLaterThanOrEqualToday,
   getFullName,
   isLaterThanStartDate,
+  getISOStringWithHour,
 } from "../../utils/helpers";
 import { getCabin } from "../../services/apiCabins";
 import useCreateBooking from "./useCreateBooking";
+import useDeleteGuest from "./useDeleteGuest";
 
 const StyledSelect = styled.select`
   font-size: 1.4rem;
@@ -50,6 +52,7 @@ function CreateBookingForm({ onCloseModal }) {
   const { isLoading: isLoadingSettings, settings } = useSettings();
   const { createOrGetGuest, isCreatingGuest } = useCreateGuest();
   const { createBooking, isCreatingBooking } = useCreateBooking();
+  const { deleteGuest, isDeletingGuest } = useDeleteGuest();
   const {
     register,
     handleSubmit,
@@ -70,7 +73,11 @@ function CreateBookingForm({ onCloseModal }) {
       isPaid: false,
     },
   });
-  const isLoading = isLoadingSettings || isCreatingGuest || isCreatingBooking;
+  const isLoading =
+    isLoadingSettings ||
+    isCreatingGuest ||
+    isCreatingBooking ||
+    isDeletingGuest;
 
   //set default value to the nationality and cabin field when they arrived
   useEffect(() => {
@@ -89,12 +96,13 @@ function CreateBookingForm({ onCloseModal }) {
       nationalID: rawNationalID,
       numGuests,
       cabinId,
-      startDate,
-      endDate,
+      startDate: rawStartDate,
+      endDate: rawEndDate,
       hasBreakfast,
       isPaid,
       observations,
     } = data;
+
     try {
       const cabin = await getCabin(Number(cabinId));
       const countryFlag = await getFlag(nationality);
@@ -103,6 +111,8 @@ function CreateBookingForm({ onCloseModal }) {
       const fullName = getFullName(firstName, lastName);
       const email = rawEmail.toLowerCase().trim();
       const nationalID = rawNationalID.trim();
+      const startDate = getISOStringWithHour(rawStartDate);
+      const endDate = getISOStringWithHour(rawEndDate);
 
       const guestData = {
         fullName,
@@ -140,11 +150,14 @@ function CreateBookingForm({ onCloseModal }) {
             extrasPrice,
             totalPrice,
           };
-          //2.2 create booking after guest created/selected successfully
+          //2.2 create booking after guest created/selected successfully, or delete user
           createBooking(bookingData, {
             onSuccess: () => {
               reset();
               onCloseModal();
+            },
+            onError: () => {
+              deleteGuest(guestId);
             },
           });
         },
@@ -259,24 +272,26 @@ function CreateBookingForm({ onCloseModal }) {
 
       <FormRow label="Start Date" error={errors?.startDate?.message}>
         <Input
-          type="datetime-local"
+          type="date"
           id="startDate"
           disabled={isLoading}
           {...register("startDate", {
+            valueAsDate: true,
             required: "This field is required",
             validate: (value) =>
-              isLaterThanNow(value, getISOSNow({ withSecond: false })) ||
-              "Start date invalid",
+              isLaterThanOrEqualToday(value, new Date()) ||
+              "Date can not be past",
           })}
         />
       </FormRow>
 
       <FormRow label="End Date" error={errors?.endDate?.message}>
         <Input
-          type="datetime-local"
+          type="date"
           id="endDate"
           disabled={isLoading}
           {...register("endDate", {
+            valueAsDate: true,
             required: "This field is required",
             validate: (value) =>
               isLaterThanStartDate(value, getValues("startDate")) ||

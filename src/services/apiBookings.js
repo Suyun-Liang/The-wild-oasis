@@ -112,12 +112,31 @@ export async function getStaysTodayActivity() {
 }
 
 export async function createBooking(newBookingObj) {
-  const { data, error } = await supabase
-    .from("bookings")
-    .insert(newBookingObj)
-    .select();
+  const {
+    cabinId: newCabinId,
+    startDate: newStartDate,
+    endDate: newEndDate,
+  } = newBookingObj;
+  let query = supabase.from("bookings");
+
+  // find if cabin is occupied at selected duration
+  const { count, error } = await query
+    .select("*", { count: "exact", head: true })
+    .eq("cabinId", newCabinId)
+    .lt("startDate", newEndDate)
+    .gt("endDate", newStartDate);
 
   if (error) throw new Error(error.message);
+
+  // if occupied, throw an error else create a booking
+  if (count > 0) throw new Error("date occupied, please choose other date");
+
+  const { data, error: bookingError } = await query
+    .insert(newBookingObj)
+    .select()
+    .single();
+
+  if (bookingError) throw new Error(bookingError.message);
 
   return data;
 }

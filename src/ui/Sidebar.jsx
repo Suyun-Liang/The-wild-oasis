@@ -19,6 +19,7 @@ function Sidebar() {
     <StyledSidebar>
       <Logo />
       <MainNav />
+      <UpLoader />
     </StyledSidebar>
   );
 }

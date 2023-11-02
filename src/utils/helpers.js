@@ -1,6 +1,5 @@
 import {
   differenceInCalendarDays,
-  differenceInMinutes,
   formatDistance,
   isAfter,
   parseISO,
@@ -54,13 +53,14 @@ export const getFullName = (fn, ln) => {
   return `${capitalizedFirstN} ${capitalizedLastN}`;
 };
 
-export const isLaterThanNow = (str1, str2) => {
-  const diff = differenceInMinutes(
-    parseISO(String(str1)),
-    parseISO(String(str2))
-  );
+export const isLaterThanOrEqualToday = (date1, date2) => {
+  const diff = differenceInCalendarDays(date1, date2);
   return diff >= 0;
 };
 
-export const isLaterThanStartDate = (str1, str2) =>
-  isAfter(parseISO(String(str1)), parseISO(String(str2)));
+export const isLaterThanStartDate = (date1, date2) => isAfter(date1, date2);
+
+export function getISOStringWithHour(date, hour = 0) {
+  date.setUTCHours(hour, 0, 0, 0);
+  return date.toISOString().slice(0, -1);
+}
