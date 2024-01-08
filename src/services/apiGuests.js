@@ -24,7 +24,10 @@ export async function CreateGetGuest(newGuestObj) {
 
   if (errorGuest) throw new Error(errorGuest.message); */
 
-  const { data: newGuest, error } = await query.insert(newGuestObj).select();
+  const { data: newGuest, error } = await query
+    .insert(newGuestObj)
+    .select()
+    .single();
 
   if (error) {
     if (error.code === "23505") {
@@ -43,9 +46,25 @@ export async function CreateGetGuest(newGuestObj) {
 }
 
 export async function deleteGuest(id) {
-  const { error } = await supabase.from("guests").delete().eq("id", id);
+  const { count, error } = await supabase
+    .from("bookings")
+    .select("*", { count: "exact", head: true })
+    .eq("guestId", id);
 
-  if (error) throw new Error(error.message);
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  if (count === 0) {
+    const { error: deleteError } = await supabase
+      .from("guests")
+      .delete()
+      .eq("id", id);
+
+    if (deleteError) {
+      throw new Error(deleteError.message);
+    }
+  }
 
   return null;
 }

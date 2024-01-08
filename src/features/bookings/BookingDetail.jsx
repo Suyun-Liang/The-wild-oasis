@@ -13,7 +13,7 @@ import ConfirmDelete from "../../ui/ConfirmDelete";
 
 import { useMoveBack } from "../../hooks/useMoveBack";
 import { useNavigate } from "react-router-dom";
-import useBooking from "./useBooking";
+import { useBooking } from "./useBooking";
 import useCheckout from "../check-in-out/useCheckout";
 import useDeleteBooking from "./useDeleteBooking";
 import Empty from "../../ui/Empty";
@@ -56,7 +56,7 @@ function BookingDetail() {
 
       <ButtonGroup>
         {status === "unconfirmed" && (
-          <Button onClick={() => navigate(`/checkin/${bookingId}`)}>
+          <Button onClick={() => navigate(`checkin/${bookingId}`)}>
             Check in
           </Button>
         )}

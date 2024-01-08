@@ -4,20 +4,28 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { Toaster } from "react-hot-toast";
 import GlobalStyles from "./styles/GlobalStyles";
 
+import Home from "./pages/Home";
+import Rooms from "./pages/Rooms";
+import RoomsDetail from "./pages/RoomsDetail";
+import Contactus from "./pages/Contactus";
+import Signin from "./pages/Signin";
+import { default as ClientLogin } from "./pages/Login";
+
 import AppLayout from "./ui/AppLayout";
-import Dashboard from "./pages/Dashboard";
-import Login from "./pages/Login";
-import Account from "./pages/Account";
-import Bookings from "./pages/Bookings";
-import Settings from "./pages/Settings";
-import Users from "./pages/Users";
-import Cabins from "./pages/Cabins";
-import PageNotFound from "./pages/PageNotFound";
-import Booking from "./pages/Booking";
-import Checkin from "./pages/Checkin";
 import ProtectedRote from "./ui/ProtectedRote";
+import Dashboard from "./pages/employee/Dashboard";
+import Login from "./pages/employee/Login";
+import Account from "./pages/employee/Account";
+import Bookings from "./pages/employee/Bookings";
+import Settings from "./pages/employee/Settings";
+import Users from "./pages/employee/Users";
+import Cabins from "./pages/employee/Cabins";
+import PageNotFound from "./pages/employee/PageNotFound";
+import Booking from "./pages/employee/Booking";
+import Checkin from "./pages/employee/Checkin";
 
 import { DarkModeProvider } from "./context/DarkModeContext";
+import AppLayoutClient from "./ui/AppLayoutClient";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -36,24 +44,38 @@ function App() {
         <GlobalStyles />
         <BrowserRouter>
           <Routes>
-            <Route
-              element={
-                <ProtectedRote>
-                  <AppLayout />
-                </ProtectedRote>
-              }
-            >
-              <Route index element={<Navigate replace to="dashboard" />} />
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/account" element={<Account />} />
-              <Route path="/bookings" element={<Bookings />} />
-              <Route path="/bookings/:bookingId" element={<Booking />} />
-              <Route path="/checkin/:bookingId" element={<Checkin />} />
-              <Route path="/settings" element={<Settings />} />
-              <Route path="/users" element={<Users />} />
-              <Route path="/cabins" element={<Cabins />} />
+            <Route index element={<Home />} />
+            <Route element={<AppLayoutClient />}>
+              <Route path="/rooms">
+                <Route index element={<Rooms />} />
+                <Route path=":roomId" element={<RoomsDetail />} />
+              </Route>
+              <Route path="/contactus" element={<Contactus />} />
+              <Route path="/signin" element={<Signin />} />
+              <Route path="/login" element={<ClientLogin />} />
             </Route>
-            <Route path="/login" element={<Login />} />
+
+            <Route path="/employee">
+              <Route
+                element={
+                  <ProtectedRote>
+                    <AppLayout />
+                  </ProtectedRote>
+                }
+              >
+                <Route index element={<Navigate replace to="dashboard" />} />
+                <Route path="dashboard" element={<Dashboard />} />
+                <Route path="account" element={<Account />} />
+                <Route path="bookings" element={<Bookings />} />
+                <Route path="bookings/:bookingId" element={<Booking />} />
+                <Route path="checkin/:bookingId" element={<Checkin />} />
+                <Route path="settings" element={<Settings />} />
+                <Route path="users" element={<Users />} />
+                <Route path="cabins" element={<Cabins />} />
+              </Route>
+              <Route path="login" element={<Login />} />
+            </Route>
+
             <Route path="*" element={<PageNotFound />} />
           </Routes>
         </BrowserRouter>

@@ -8,12 +8,14 @@ const StyledModal = styled.div`
   position: fixed;
   top: 50%;
   left: 50%;
+  max-height: calc(100vh - 200px);
   transform: translate(-50%, -50%);
   background-color: var(--color-grey-0);
   border-radius: var(--border-radius-lg);
   box-shadow: var(--shadow-lg);
   padding: 3.2rem 4rem;
   transition: all 0.5s;
+  overflow-y: auto;
 `;
 
 const Overlay = styled.div`

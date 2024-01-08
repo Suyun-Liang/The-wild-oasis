@@ -1,6 +1,10 @@
 import styled from "styled-components";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { addMonths, endOfMonth, isSameDay } from "date-fns";
+import { DateRange } from "react-date-range";
+import "react-date-range/dist/styles.css"; // main css file
+import "react-date-range/dist/theme/default.css"; // theme css file
 
 import Form from "../../ui/Form";
 import FormRow from "../../ui/FormRow";
@@ -9,19 +13,23 @@ import Button from "../../ui/Button";
 
 import useCabins from "../cabins/useCabins";
 import useSettings from "../settings/useSettings";
-import { getFlag, useCountries } from "../../hooks/useCountries";
+import { useCountries } from "../../hooks/useCountries";
 import useCreateGuest from "./useCreateGuest";
+import useCreateBooking from "./useCreateBooking";
+import useDeleteGuest from "./useDeleteGuest";
+import { useUnavailableDatesIn } from "./useBooking";
+import { getCabin, getCabins } from "../../services/apiCabins";
+import { getFlag } from "../../services/apiCountries";
+
 import {
-  getISOSNow,
+  getISONow,
   subtractDates,
   isLaterThanOrEqualToday,
   getFullName,
   isLaterThanStartDate,
   getISOStringWithHour,
+  getDatesBetween,
 } from "../../utils/helpers";
-import { getCabin } from "../../services/apiCabins";
-import useCreateBooking from "./useCreateBooking";
-import useDeleteGuest from "./useDeleteGuest";
 
 const StyledSelect = styled.select`
   font-size: 1.4rem;
@@ -50,44 +58,54 @@ function CreateBookingForm({ onCloseModal }) {
   const { isLoading: isLoadingCabins, cabins } = useCabins();
   const { isLoading: isLoadingCountries, countries } = useCountries();
   const { isLoading: isLoadingSettings, settings } = useSettings();
+  // const { isLoading: isLoadingCabinBooking, cabinBooking } = useCabinBooking();
   const { createOrGetGuest, isCreatingGuest } = useCreateGuest();
   const { createBooking, isCreatingBooking } = useCreateBooking();
   const { deleteGuest, isDeletingGuest } = useDeleteGuest();
+  const [dateRange, setDateRange] = useState([
+    { startDate: null, endDate: null, key: "selection" },
+  ]);
+
   const {
     register,
     handleSubmit,
     setValue,
     getValues,
     reset,
+    watch,
     formState: { errors },
   } = useForm({
-    defaultValues: {
-      firstName: "",
-      lastName: "",
-      email: "",
-      nationalID: "",
-      observations: "",
-      numGuests: 1,
-      startDate: getISOSNow({ withSecond: false }),
-      hasBreakfast: false,
-      isPaid: false,
+    defaultValues: async () => {
+      const { cabins } = await getCabins();
+      return {
+        firstName: "",
+        lastName: "",
+        email: "",
+        nationality: "",
+        nationalID: "",
+        observations: "",
+        numGuests: 1,
+        startDate: dateRange[0].startDate,
+        endDate: dateRange[0].endDate,
+        hasBreakfast: false,
+        isPaid: false,
+        cabinId: cabins?.at(0).id,
+      };
     },
   });
+
+  const watchCabinId = watch("cabinId");
+  const { dates: unavailableDates, isLoading: isLoadingDates } =
+    useUnavailableDatesIn(watchCabinId);
+
   const isLoading =
     isLoadingSettings ||
     isCreatingGuest ||
     isCreatingBooking ||
     isDeletingGuest;
 
-  //set default value to the nationality and cabin field when they arrived
-  useEffect(() => {
-    if (cabins && countries.length) {
-      setValue("nationality", countries.at(0));
-      setValue("cabinId", cabins.at(0).id);
-    }
-  }, [cabins, countries, setValue]);
-
   async function onSubmit(data) {
+    console.log(data);
     const {
       firstName,
       lastName,
@@ -135,7 +153,7 @@ function CreateBookingForm({ onCloseModal }) {
           const totalPrice = cabinPrice + extrasPrice;
 
           const bookingData = {
-            created_at: getISOSNow(),
+            created_at: getISONow(),
             startDate,
             endDate,
             numGuests,
@@ -187,7 +205,6 @@ function CreateBookingForm({ onCloseModal }) {
           })}
         />
       </FormRow>
-
       <FormRow label="Last Name" error={errors?.lastName?.message}>
         <Input
           type="text"
@@ -202,7 +219,6 @@ function CreateBookingForm({ onCloseModal }) {
           })}
         />
       </FormRow>
-
       <FormRow label="Email" error={errors?.email?.message}>
         <Input
           type="email"
@@ -217,21 +233,19 @@ function CreateBookingForm({ onCloseModal }) {
           })}
         />
       </FormRow>
-
       <FormRow label="Nationality" error={errors?.nationality?.message}>
         <StyledSelect
           id="nationality"
           disabled={isLoadingCountries || isLoading}
-          {...register("nationality", { required: true })}
+          {...register("nationality", { required: "This field id requied" })}
         >
-          {countries.map((country) => (
+          {countries?.map((country) => (
             <option key={country} value={country}>
               {country}
             </option>
           ))}
         </StyledSelect>
       </FormRow>
-
       <FormRow label="Nationality ID" error={errors?.nationalID?.message}>
         <Input
           type="text"
@@ -242,7 +256,6 @@ function CreateBookingForm({ onCloseModal }) {
           })}
         />
       </FormRow>
-
       <FormRow label="Number of guests" error={errors?.numGuests?.message}>
         <Input
           type="number"
@@ -255,12 +268,18 @@ function CreateBookingForm({ onCloseModal }) {
           })}
         />
       </FormRow>
-
       <FormRow label="Cabin" error={errors?.cabinId?.message}>
         <StyledSelect
           id="cabinId"
           disabled={isLoadingCabins || isLoading}
-          {...register("cabinId", { required: true })}
+          {...register("cabinId", {
+            valueAsNumber: true,
+            required: true,
+            onChange: () =>
+              setDateRange([
+                { startDate: null, endDate: null, key: "selection" },
+              ]),
+          })}
         >
           {cabins?.map((cabin) => (
             <option key={cabin.id} value={cabin.id}>
@@ -270,7 +289,7 @@ function CreateBookingForm({ onCloseModal }) {
         </StyledSelect>
       </FormRow>
 
-      <FormRow label="Start Date" error={errors?.startDate?.message}>
+      {/* <FormRow label="Start Date" error={errors?.startDate?.message}>
         <Input
           type="date"
           id="startDate"
@@ -284,7 +303,6 @@ function CreateBookingForm({ onCloseModal }) {
           })}
         />
       </FormRow>
-
       <FormRow label="End Date" error={errors?.endDate?.message}>
         <Input
           type="date"
@@ -298,6 +316,57 @@ function CreateBookingForm({ onCloseModal }) {
               "End date should be after start date",
           })}
         />
+      </FormRow> */}
+      <Input
+        type="hidden"
+        id="startDate"
+        disabled={isLoading}
+        {...register("startDate", {
+          valueAsDate: true,
+          required: "Please choose a check in date",
+        })}
+      />
+
+      <Input
+        type="hidden"
+        id="endDate"
+        disabled={isLoading}
+        {...register("endDate", {
+          valueAsDate: true,
+          required: "Please choose a check in date",
+          validate: (value) =>
+            !isSameDay(value, getValues("startDate")) ||
+            "duration at least 1 day",
+        })}
+      />
+
+      <FormRow
+        label="Check in - Check out"
+        error={errors?.startDate?.message || errors?.endDate?.message}
+        type="calendar"
+      >
+        <DateRange
+          editableDateInputs={false}
+          onChange={(item) => {
+            setDateRange([item.selection]);
+            setValue("startDate", item.selection.startDate);
+            setValue("endDate", item.selection.endDate);
+          }}
+          startDatePlaceholder="Check in"
+          endDatePlaceholder="Check out"
+          ranges={dateRange}
+          rangeColors={["#4f46e5"]}
+          minDate={new Date()}
+          maxDate={endOfMonth(addMonths(new Date(), 6))}
+          disabledDates={
+            isLoadingDates || unavailableDates?.length === 0
+              ? getDatesBetween(
+                  new Date(),
+                  endOfMonth(addMonths(new Date(), 6))
+                )
+              : unavailableDates
+          }
+        />
       </FormRow>
 
       <FormRow label="Note" error={errors?.observations?.message}>
@@ -308,7 +377,6 @@ function CreateBookingForm({ onCloseModal }) {
           {...register("observations")}
         />
       </FormRow>
-
       <FormRow label="Add breakfast">
         <Checkbox
           type="checkbox"
@@ -316,7 +384,6 @@ function CreateBookingForm({ onCloseModal }) {
           {...register("hasBreakfast")}
         />
       </FormRow>
-
       <FormRow label="Already paid">
         <Checkbox
           type="checkbox"
@@ -324,12 +391,16 @@ function CreateBookingForm({ onCloseModal }) {
           {...register("isPaid")}
         />
       </FormRow>
-
       <FormRow>
-        <Button type="button" $variation="secondary" onClick={onCloseModal}>
+        <Button
+          type="button"
+          $variation="secondary"
+          onClick={onCloseModal}
+          className="modal_btn"
+        >
           Cancel
         </Button>
-        <Button>Submit</Button>
+        <Button className="modal_btn">Submit</Button>
       </FormRow>
     </Form>
   );

@@ -1,9 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
 
-import { getBooking } from "../../services/apiBookings";
+import {
+  getBooking,
+  getUnavailableDatesInCabin,
+} from "../../services/apiBookings";
 
-function useBooking() {
+export function useBooking() {
   const { bookingId } = useParams();
   const {
     data: booking,
@@ -18,4 +21,10 @@ function useBooking() {
   return { booking, isLoading, error };
 }
 
-export default useBooking;
+export function useUnavailableDatesIn(cabinId, { isDateInterval } = {}) {
+  const { data: dates, isLoading } = useQuery({
+    queryKey: ["unavailable dates", cabinId],
+    queryFn: () => getUnavailableDatesInCabin(cabinId, isDateInterval),
+  });
+  return { dates, isLoading };
+}

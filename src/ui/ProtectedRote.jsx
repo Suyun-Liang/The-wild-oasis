@@ -21,7 +21,7 @@ function ProtectedRote({ children }) {
 
   //2.If no authenticated user, redirect to "./login"
   useEffect(() => {
-    if (!isAuthenticated && !isLoading) navigate("/login");
+    if (!isAuthenticated && !isLoading) navigate("login");
   }, [isAuthenticated, isLoading, navigate]);
 
   //3.While loading, show a spinner

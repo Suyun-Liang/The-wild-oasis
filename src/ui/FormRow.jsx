@@ -2,7 +2,8 @@ import { styled } from "styled-components";
 
 const StyledFormRow = styled.div`
   display: grid;
-  align-items: center;
+  align-items: ${(props) =>
+    props.className === "calendar" ? "flex-start" : "center"};
   grid-template-columns: 24rem 1fr 1.2fr;
   gap: 2.4rem;
 
@@ -20,7 +21,7 @@ const StyledFormRow = styled.div`
     border-bottom: 1px solid var(--color-grey-100);
   }
 
-  &:has(button) {
+  &:has(.modal_btn) {
     display: flex;
     justify-content: flex-end;
     gap: 1.2rem;
@@ -36,10 +37,10 @@ const Error = styled.span`
   color: var(--color-red-700);
 `;
 
-function FormRow({ label, children, error }) {
+function FormRow({ label, children, error, type = `primary` }) {
   return (
-    <StyledFormRow>
-      {label && <Label htmlFor={children.props.id}>{label}</Label>}
+    <StyledFormRow className={type}>
+      {label && <Label htmlFor={children.props?.id}>{label}</Label>}
       {children}
       {error && <Error>{error}</Error>}
     </StyledFormRow>

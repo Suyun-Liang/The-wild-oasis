@@ -1,5 +1,6 @@
 import {
   differenceInCalendarDays,
+  format,
   formatDistance,
   isAfter,
   parseISO,
@@ -36,11 +37,13 @@ export const formatCurrency = (value) =>
     value
   );
 
-export const getISOSNow = ({ withSecond } = { withSecond: true }) => {
+export const getISONow = ({ withTime = true } = {}) => {
   const tzOffset = new Date().getTimezoneOffset() * 60000;
-  return new Date(Date.now() - tzOffset)
-    .toISOString()
-    .slice(0, withSecond ? -1 : 16);
+  const date = new Date(Date.now() - tzOffset);
+
+  if (!withTime) date.setUTCHours(0, 0, 0, 0);
+
+  return date.toISOString().slice(0, -1);
 };
 
 export const getFullName = (fn, ln) => {
@@ -61,6 +64,58 @@ export const isLaterThanOrEqualToday = (date1, date2) => {
 export const isLaterThanStartDate = (date1, date2) => isAfter(date1, date2);
 
 export function getISOStringWithHour(date, hour = 0) {
+  if (!date) return;
+  if (typeof date === "string") date = new Date(date);
   date.setUTCHours(hour, 0, 0, 0);
   return date.toISOString().slice(0, -1);
+}
+
+export function getDatesBetween(startDate, endDate, datesArr = []) {
+  for (let date = startDate; date < endDate; date.setDate(date.getDate() + 1)) {
+    datesArr.push(new Date(date));
+  }
+
+  return datesArr;
+}
+
+export function formatDate(inputDate, formatStr) {
+  if (!inputDate) return;
+  const date = typeof inputDate === "string" ? new Date(inputDate) : inputDate;
+  return format(date, formatStr);
+}
+
+export function chunckArr(arr, size) {
+  if (size <= 0) return;
+
+  const chunked = [];
+
+  if (!arr) return chunked;
+
+  for (let i = 0; i < arr.length; i += size) {
+    chunked.push(arr.slice(i, i + size));
+  }
+
+  return chunked;
+}
+
+// only used for internationized date, since compare is the method of this class
+export function isDateUnavailable(disabledRanges) {
+  return (date) =>
+    disabledRanges?.some(
+      (interval) =>
+        date.compare(interval[0]) >= 0 && date.compare(interval[1]) < 0
+    );
+}
+
+export function getParamsStr(filterObj) {
+  if (typeof filterObj !== "object") return;
+
+  const keysArr = Object.keys(filterObj);
+
+  const result = keysArr.reduce((acc, key, i) => {
+    if (i === 0) return (acc += `${key}=${filterObj[key]}`);
+    return (acc += `&${key}=${filterObj[key]}`);
+  }, "");
+  // {checkin, checkout, adults, children, pets }
+  return result;
 }

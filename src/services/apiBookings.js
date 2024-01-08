@@ -1,7 +1,9 @@
 import supabase from "./supabase";
 
-import { getToday } from "../utils/helpers";
+import { getDatesBetween, getISONow, getToday } from "../utils/helpers";
 import { PAGE_SIZE } from "../utils/constants";
+import { parseISO } from "date-fns";
+import { parseDate } from "@internationalized/date";
 
 export async function getBookings({ filter, sortBy, page }) {
   let query = supabase
@@ -52,6 +54,62 @@ export async function getBooking(id) {
   }
 
   return data;
+}
+
+export async function getCabinBooking(cabinId, { isAfterToday = false } = {}) {
+  if (!cabinId) return;
+
+  let query = supabase.from("bookings").select("*").eq("cabinId", cabinId);
+
+  if (isAfterToday) {
+    const today = getISONow({ withTime: false });
+    query = query.or(`startDate.gte.${today}, endDate.gte.${today}`);
+  }
+
+  const { data, error } = await query;
+
+  if (error) {
+    console.error(error);
+    throw new Error("Booking not found");
+  }
+
+  return data;
+}
+
+export async function getUnavailableDatesInCabin(
+  cabinId,
+  isDateInterval = false
+) {
+  if (!cabinId) return [];
+
+  let datesArr = [];
+  try {
+    const cabinBookingData = await getCabinBooking(cabinId, {
+      isAfterToday: true,
+    });
+
+    if (isDateInterval) {
+      // get disableRange in internationlized formate
+      datesArr = cabinBookingData.map((booking) => [
+        parseDate(booking.startDate.slice(0, 10)),
+        parseDate(booking.endDate.slice(0, 10)),
+      ]);
+    } else {
+      // get flatten disable dates in one array
+      for (let index = 0; index < cabinBookingData.length; index++) {
+        getDatesBetween(
+          parseISO(cabinBookingData[index].startDate),
+          parseISO(cabinBookingData[index].endDate),
+          datesArr
+        );
+      }
+    }
+
+    return datesArr;
+  } catch (error) {
+    console.error(error.message);
+    throw new Error("Unable to get unavailable dates");
+  }
 }
 
 // Returns all BOOKINGS that are were created after the given date. Useful to get bookings created in the last 30 days, for example.

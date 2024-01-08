@@ -1,17 +1,30 @@
 import supabase, { supabaseUrl } from "./supabase";
+import { ROOM_PAGE_SIZE } from "../utils/constants";
 
-export async function getCabins() {
-  const { data, error } = await supabase
+export async function getCabins({ pageParam, limitNum } = {}) {
+  let query = supabase
     .from("cabins")
-    .select("*")
+    .select("*", { count: "exact" })
     .order("name");
+
+  if (pageParam) {
+    const from = (pageParam - 1) * ROOM_PAGE_SIZE;
+    const to = from + ROOM_PAGE_SIZE - 1;
+    query = query.range(from, to);
+  }
+
+  if (limitNum) {
+    query = query.limit(limitNum);
+  }
+
+  const { data: cabins, error, count } = await query;
 
   if (error) {
     console.error(error);
     throw new Error("cabins could not be loaded");
   }
 
-  return data;
+  return { cabins, count };
 }
 export async function getCabin(id) {
   if (!id) return;
@@ -83,4 +96,45 @@ export async function createEditCabin(newCabin, id) {
   }
 
   return data;
+}
+
+export async function getAvailableCabinIn({
+  pageParam = 1,
+  checkin,
+  checkout,
+}) {
+  if (!checkin || !checkout) return getCabins({ pageParam });
+
+  //1. get unavailable cabins
+  const { data, error } = await supabase
+    .from("bookings")
+    .select("cabinId")
+    .gt("endDate", checkin)
+    .lt("startDate", checkout);
+  if (error) throw new Error("there is error fetching cabin from booking");
+
+  const rawCabins = data.map((e) => e.cabinId);
+
+  const uniqueData = rawCabins
+    .filter((e, i) => rawCabins.indexOf(e) === i)
+    .join();
+
+  //2. get available cabins
+  let query = supabase
+    .from("cabins")
+    .select("*", { count: "exact" })
+    .not("id", "in", `(${uniqueData})`)
+    .order("id");
+
+  // 3. pagination
+  if (pageParam) {
+    const from = (pageParam - 1) * ROOM_PAGE_SIZE;
+    const to = from + ROOM_PAGE_SIZE - 1;
+    query = query.range(from, to);
+  }
+
+  const { data: cabins, error: cabinError, count } = await query;
+
+  if (cabinError) throw new Error("there is error fetching cabin");
+  return { cabins, count };
 }

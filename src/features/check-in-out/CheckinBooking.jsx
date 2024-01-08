@@ -11,7 +11,7 @@ import Spinner from "../../ui/Spinner";
 import Checkbox from "../../ui/Checkbox";
 
 import { useMoveBack } from "../../hooks/useMoveBack";
-import useBooking from "../bookings/useBooking";
+import { useBooking } from "../bookings/useBooking";
 import useSettings from "../settings/useSettings";
 import { formatCurrency } from "../../utils/helpers";
 import useCheckin from "./useCheckin";
