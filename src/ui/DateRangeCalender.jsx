@@ -112,7 +112,7 @@ const StyledCalendarCell = styled(CalendarCell)`
 
 function DateRangeCalender(props) {
   const [date, setDate] = useState(
-    props.initialDate
+    props.initialDate?.checkin && props.initialDate?.checkout
       ? {
           start: parseDate(props.initialDate.checkin),
           end: parseDate(props.initialDate.checkout),

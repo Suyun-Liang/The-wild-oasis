@@ -177,12 +177,10 @@ function SearchCard() {
         </Label>
         <Label>
           <HiCalendarDays />
-
           <span>Check-out</span>
         </Label>
         <Label>
           <HiOutlineUser />
-
           <span>Person</span>
         </Label>
         <div></div>
