@@ -21,13 +21,13 @@ const ReserveButton = styled(Button)`
   }
 `;
 
-export function RoomSidebar({ cabin }) {
+export function RoomSidebar({ cabin, isDateUnavailable }) {
   return (
     <Container>
       <PriceTitle>
         €{cabin?.regularPrice} <span>night</span>
       </PriceTitle>
-      <RoomSearchCard />
+      <RoomSearchCard isDateUnavailable={isDateUnavailable} />
       <ReserveButton>Reserve</ReserveButton>
       <div>Price detail</div>
     </Container>

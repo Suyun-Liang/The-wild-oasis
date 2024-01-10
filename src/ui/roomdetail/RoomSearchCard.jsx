@@ -1,28 +1,45 @@
 import styled from "styled-components";
+import { today, getLocalTimeZone } from "@internationalized/date";
+
+import { PopoverTrigger } from "../date_range_calendar/PopoverTrigger";
+import DateRangeCalender from "../date_range_calendar/DateRangeCalender";
+import Select from "../SelectSearchCard";
+import { SearchCard, CheckinOutCard, GuestCard } from "../SearchCard";
 
 const Container = styled.div`
-  display: grid;
+  display: flex;
+  flex-direction: column;
   min-width: 300px;
-
-  grid-template-columns: 1fr 1fr;
 `;
 
-const PersonArea = styled.div`
-  grid-column: 1 / -1;
-`;
-
-export function RoomSearchCard() {
+export function RoomSearchCard({ isDateUnavailable }) {
   return (
     <Container>
-      <div>
-        <div>check-in</div>
-        <div>mm/dd/yyyy</div>
-      </div>
-      <div>
-        <div>check-out</div>
-        <div>mm/dd/yyyy</div>
-      </div>
-      <PersonArea>Person</PersonArea>
+      {/* <PopoverTrigger
+        element={
+          <DateRangeCalender
+            minValue={todayObj}
+            visibleDuration={{ months: 2 }}
+            initialDate={initialDate}
+          />
+        }
+        type="group"
+      >
+        <div>
+          <div>check-in</div>
+          <div>mm/dd/yyyy</div>
+        </div>
+        <div>
+          <div>check-out</div>
+          <div>mm/dd/yyyy</div>
+        </div>
+      </PopoverTrigger>
+
+      <PopoverTrigger>
+        <Select label="guest" />
+      </PopoverTrigger> */}
+      <CheckinOutCard isDateUnavailable={isDateUnavailable} />
+      <GuestCard />
     </Container>
   );
 }

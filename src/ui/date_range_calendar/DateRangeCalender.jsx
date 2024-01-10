@@ -11,7 +11,7 @@ import styled from "styled-components";
 import {
   checkinAt,
   checkoutAt,
-} from "../features/bookings/guests/bookingSlice";
+} from "../../features/bookings/guests/bookingSlice";
 import { parseDate } from "@internationalized/date";
 
 const StyledRangeCalendar = styled(RangeCalendar)`

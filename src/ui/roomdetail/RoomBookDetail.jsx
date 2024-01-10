@@ -2,7 +2,7 @@ import styled from "styled-components";
 import { useSearchParams } from "react-router-dom";
 import { getLocalTimeZone, today } from "@internationalized/date";
 
-import DateRangeCalendar from "../DateRangeCalender.jsx";
+import DateRangeCalendar from "../date_range_calendar/DateRangeCalender.jsx";
 import { RoomSidebar } from "./RoomSidebar.jsx";
 
 import { useUnavailableDatesIn } from "../../features/bookings/useBooking.js";
@@ -30,7 +30,11 @@ export function RoomBookDetail({ cabin }) {
         isDateUnavailable={isDateUnavailable(disabledRange)}
         initialDate={{ checkin, checkout }}
       />
-      <RoomSidebar cabin={cabin} />
+      <RoomSidebar
+        cabin={cabin}
+        initialDate={{ checkin, checkout }}
+        isDateUnavailable={isDateUnavailable(disabledRange)}
+      />
     </BookDetails>
   );
 }
