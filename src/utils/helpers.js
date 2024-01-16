@@ -49,10 +49,8 @@ export const getISONow = ({ withTime = true } = {}) => {
 export const getFullName = (fn, ln) => {
   const firstName = fn.trim();
   const lastName = ln.trim();
-  const capitalizedFirstN =
-    firstName.at(0).toUpperCase() + firstName.slice(1).toLowerCase();
-  const capitalizedLastN =
-    lastName.at(0).toUpperCase() + lastName.slice(1).toLowerCase();
+  const capitalizedFirstN = capitalize(firstName);
+  const capitalizedLastN = capitalize(lastName);
   return `${capitalizedFirstN} ${capitalizedLastN}`;
 };
 
@@ -113,9 +111,14 @@ export function getParamsStr(filterObj) {
   const keysArr = Object.keys(filterObj);
 
   const result = keysArr.reduce((acc, key, i) => {
+    if (!filterObj[key]) return acc;
     if (i === 0) return (acc += `${key}=${filterObj[key]}`);
     return (acc += `&${key}=${filterObj[key]}`);
   }, "");
   // {checkin, checkout, adults, children, pets }
   return result;
+}
+
+export function capitalize(str) {
+  return str.at(0).toUpperCase() + str.slice(1).toLowerCase();
 }

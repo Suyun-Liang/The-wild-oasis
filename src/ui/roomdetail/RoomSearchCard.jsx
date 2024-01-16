@@ -12,7 +12,11 @@ const Container = styled.div`
   min-width: 300px;
 `;
 
-export function RoomSearchCard({ isDateUnavailable }) {
+export function RoomSearchCard({
+  isDateUnavailable,
+  initialDate,
+  controlledDate,
+}) {
   return (
     <Container>
       {/* <PopoverTrigger
@@ -38,7 +42,11 @@ export function RoomSearchCard({ isDateUnavailable }) {
       <PopoverTrigger>
         <Select label="guest" />
       </PopoverTrigger> */}
-      <CheckinOutCard isDateUnavailable={isDateUnavailable} />
+      <CheckinOutCard
+        isDateUnavailable={isDateUnavailable}
+        initialDate={initialDate}
+        controlledDate={controlledDate}
+      />
       <GuestCard />
     </Container>
   );

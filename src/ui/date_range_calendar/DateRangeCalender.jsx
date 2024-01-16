@@ -13,6 +13,7 @@ import {
   checkoutAt,
 } from "../../features/bookings/guests/bookingSlice";
 import { parseDate } from "@internationalized/date";
+import { useDate } from "../../context/DateContext";
 
 const StyledRangeCalendar = styled(RangeCalendar)`
   width: fit-content;
@@ -125,6 +126,8 @@ function DateRangeCalender(props) {
   const start = date?.start;
   const end = date?.end;
 
+  useEffect(() => {}, []);
+
   useEffect(() => {
     let formStart = start?.toString();
     let formEnd = end?.toString();
@@ -132,13 +135,16 @@ function DateRangeCalender(props) {
     if (formStart == formEnd) {
       formEnd = end?.add({ days: 1 }).toString();
     }
-
     dispatch(checkinAt(formStart));
     dispatch(checkoutAt(formEnd));
   }, [start, end, dispatch]);
 
   return (
-    <StyledRangeCalendar value={date} onChange={setDate} {...props}>
+    <StyledRangeCalendar
+      value={props.controlledDate?.date || date}
+      onChange={props.controlledDate?.setDate || setDate}
+      {...props}
+    >
       <header>
         <StyledButton slot="previous">◀</StyledButton>
         <StyledHeading />

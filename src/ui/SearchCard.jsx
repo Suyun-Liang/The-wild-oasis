@@ -54,13 +54,6 @@ export function SearchCard() {
     guests: { adults, children, pets },
   } = useSelector((state) => state.booking);
 
-  const checkinLabel = formatDate(checkin, "MMM d");
-  const checkoutLabel = formatDate(checkout, "MMM d");
-  const guestNum = adults + children;
-  const guestLabel =
-    `${guestNum} ${guestNum === 1 ? "guest" : "guests"} ` +
-    `${pets > 0 ? `, ${pets} ${pets === 1 ? "pet" : "pets"}` : ""}`;
-
   function handleSubmit() {
     navigate({
       pathname: "/rooms",
@@ -93,7 +86,11 @@ export function SearchCard() {
   );
 }
 
-export function CheckinOutCard({ isDateUnavailable }) {
+export function CheckinOutCard({
+  isDateUnavailable,
+  initialDate,
+  controlledDate,
+}) {
   const { checkin, checkout } = useSelector((state) => state.booking);
 
   const checkinLabel = formatDate(checkin, "MMM d");
@@ -107,7 +104,9 @@ export function CheckinOutCard({ isDateUnavailable }) {
         <DateRangeCalender
           minValue={todayObj}
           visibleDuration={{ months: 2 }}
+          initialDate={initialDate}
           isDateUnavailable={isDateUnavailable}
+          controlledDate={controlledDate}
         />
       }
       type="group"

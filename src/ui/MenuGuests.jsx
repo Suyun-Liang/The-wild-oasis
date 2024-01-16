@@ -102,6 +102,8 @@ function MenuGuests() {
     (state) => state.booking.guests
   );
 
+  console.log(adults);
+
   return (
     <Table role="table">
       <Row

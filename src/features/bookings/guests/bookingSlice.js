@@ -1,7 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  date: null,
   checkin: null,
   checkout: null,
   guests: { adults: 2, children: 0, pets: 0 },
@@ -48,6 +47,15 @@ const bookingSlice = createSlice({
         state.guests.pets -= 1;
       }
     },
+    updateAdults(state, action) {
+      state.guests.adults = Number(action.payload);
+    },
+    updateChildren(state, action) {
+      state.guests.children = Number(action.payload);
+    },
+    updatePets(state, action) {
+      state.guests.pets = Number(action.payload);
+    },
   },
 });
 
@@ -60,6 +68,9 @@ export const {
   decrementChildren,
   incrementPets,
   decrementPets,
+  updateAdults,
+  updateChildren,
+  updatePets,
 } = bookingSlice.actions;
 
 export default bookingSlice.reducer;

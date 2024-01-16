@@ -40,8 +40,8 @@ function RoomsContent() {
     }
   });
 
-  const checkin = getISOStringWithHour(search.checkin);
-  const checkout = getISOStringWithHour(search.checkout);
+  const checkin = getISOStringWithHour(search?.checkin);
+  const checkout = getISOStringWithHour(search?.checkout);
 
   const {
     cabins,
@@ -68,20 +68,6 @@ function RoomsContent() {
     </Wrapper>
   );
 }
-
-// function ShowMoreButton({ fetchNextPage, hasNextPage }) {
-//   const { myRef } = useObserver({ callback: fetchNextPage });
-
-//   function nextPage() {
-//     fetchNextPage();
-//   }
-
-//   return (
-//     <Button onClick={nextPage} disabled={!hasNextPage} ref={myRef}>
-//       show more
-//     </Button>
-//   );
-// }
 
 function Rooms() {
   return (
