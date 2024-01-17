@@ -31,7 +31,7 @@ import {
   getDatesBetween,
 } from "../../utils/helpers";
 
-const StyledSelect = styled.select`
+export const StyledSelect = styled.select`
   font-size: 1.4rem;
   font-weight: 500;
   max-width: 232px;
@@ -288,35 +288,6 @@ function CreateBookingForm({ onCloseModal }) {
           ))}
         </StyledSelect>
       </FormRow>
-
-      {/* <FormRow label="Start Date" error={errors?.startDate?.message}>
-        <Input
-          type="date"
-          id="startDate"
-          disabled={isLoading}
-          {...register("startDate", {
-            valueAsDate: true,
-            required: "This field is required",
-            validate: (value) =>
-              isLaterThanOrEqualToday(value, new Date()) ||
-              "Date can not be past",
-          })}
-        />
-      </FormRow>
-      <FormRow label="End Date" error={errors?.endDate?.message}>
-        <Input
-          type="date"
-          id="endDate"
-          disabled={isLoading}
-          {...register("endDate", {
-            valueAsDate: true,
-            required: "This field is required",
-            validate: (value) =>
-              isLaterThanStartDate(value, getValues("startDate")) ||
-              "End date should be after start date",
-          })}
-        />
-      </FormRow> */}
       <Input
         type="hidden"
         id="startDate"

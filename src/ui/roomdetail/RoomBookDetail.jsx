@@ -54,9 +54,6 @@ export function RoomBookDetail({ cabin }) {
     });
   }, [searchParams, dispatch]);
 
-  const checkin = searchParams.get("checkin");
-  const checkout = searchParams.get("checkout");
-
   const { dates: disabledRange } = useUnavailableDatesIn(cabin?.id, {
     isDateInterval: true,
   });
@@ -66,12 +63,10 @@ export function RoomBookDetail({ cabin }) {
         aria-label="date calendar"
         minValue={today(getLocalTimeZone())}
         isDateUnavailable={isDateUnavailable(disabledRange)}
-        initialDate={{ checkin, checkout }}
         controlledDate={value}
       />
       <RoomSidebar
         cabin={cabin}
-        initialDate={{ checkin, checkout }}
         isDateUnavailable={isDateUnavailable(disabledRange)}
         controlledDate={value}
       />

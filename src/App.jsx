@@ -10,6 +10,7 @@ import RoomsDetail from "./pages/RoomsDetail";
 import Contactus from "./pages/Contactus";
 import Signin from "./pages/Signin";
 import { default as ClientLogin } from "./pages/Login";
+import { default as ClientBooking } from "./pages/Booking";
 
 import AppLayout from "./ui/AppLayout";
 import ProtectedRote from "./ui/ProtectedRote";
@@ -53,6 +54,7 @@ function App() {
               <Route path="/contactus" element={<Contactus />} />
               <Route path="/signin" element={<Signin />} />
               <Route path="/login" element={<ClientLogin />} />
+              <Route path="/book" element={<ClientBooking />} />
             </Route>
 
             <Route path="/employee">

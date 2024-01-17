@@ -1,6 +1,7 @@
 import styled from "styled-components";
 import Button from "../Button";
 import { RoomSearchCard } from "./RoomSearchCard";
+import { useNavigate } from "react-router-dom";
 
 const Container = styled.div`
   display: flex;
@@ -27,6 +28,11 @@ export function RoomSidebar({
   initialDate,
   controlledDate,
 }) {
+  const navigate = useNavigate();
+  function handleClick() {
+    navigate("/book");
+  }
+
   return (
     <Container>
       <PriceTitle>
@@ -37,7 +43,7 @@ export function RoomSidebar({
         initialDate={initialDate}
         controlledDate={controlledDate}
       />
-      <ReserveButton>Reserve</ReserveButton>
+      <ReserveButton onClick={handleClick}>Reserve</ReserveButton>
       <div>Price detail</div>
     </Container>
   );
