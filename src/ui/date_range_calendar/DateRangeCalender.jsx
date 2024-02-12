@@ -12,6 +12,7 @@ import {
   checkinAt,
   checkoutAt,
 } from "../../features/bookings/guests/bookingSlice";
+import { getLocalTimeZone, today } from "@internationalized/date";
 
 const StyledRangeCalendar = styled(RangeCalendar)`
   width: fit-content;
@@ -129,6 +130,7 @@ function DateRangeCalender(props) {
 
   return (
     <StyledRangeCalendar
+      minValue={today(getLocalTimeZone())}
       value={props.controlledDate?.date || date}
       onChange={props.controlledDate?.setDate || setDate}
       {...props}

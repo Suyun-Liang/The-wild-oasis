@@ -27,6 +27,7 @@ import Checkin from "./pages/employee/Checkin";
 
 import { DarkModeProvider } from "./context/DarkModeContext";
 import AppLayoutClient from "./ui/AppLayoutClient";
+import { DateProvider } from "./context/DateContext";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -44,42 +45,44 @@ function App() {
         <ReactQueryDevtools initialIsOpen={false} />
         <GlobalStyles />
         <BrowserRouter>
-          <Routes>
-            <Route index element={<Home />} />
-            <Route element={<AppLayoutClient />}>
-              <Route path="/rooms">
-                <Route index element={<Rooms />} />
-                <Route path=":roomId" element={<RoomsDetail />} />
+          <DateProvider>
+            <Routes>
+              <Route index element={<Home />} />
+              <Route element={<AppLayoutClient />}>
+                <Route path="/rooms">
+                  <Route index element={<Rooms />} />
+                  <Route path=":roomId" element={<RoomsDetail />} />
+                </Route>
+                <Route path="/contactus" element={<Contactus />} />
+                <Route path="/signin" element={<Signin />} />
+                <Route path="/login" element={<ClientLogin />} />
+                <Route path="/book/:roomId" element={<ClientBooking />} />
               </Route>
-              <Route path="/contactus" element={<Contactus />} />
-              <Route path="/signin" element={<Signin />} />
-              <Route path="/login" element={<ClientLogin />} />
-              <Route path="/book" element={<ClientBooking />} />
-            </Route>
 
-            <Route path="/employee">
-              <Route
-                element={
-                  <ProtectedRote>
-                    <AppLayout />
-                  </ProtectedRote>
-                }
-              >
-                <Route index element={<Navigate replace to="dashboard" />} />
-                <Route path="dashboard" element={<Dashboard />} />
-                <Route path="account" element={<Account />} />
-                <Route path="bookings" element={<Bookings />} />
-                <Route path="bookings/:bookingId" element={<Booking />} />
-                <Route path="checkin/:bookingId" element={<Checkin />} />
-                <Route path="settings" element={<Settings />} />
-                <Route path="users" element={<Users />} />
-                <Route path="cabins" element={<Cabins />} />
+              <Route path="/employee">
+                <Route
+                  element={
+                    <ProtectedRote>
+                      <AppLayout />
+                    </ProtectedRote>
+                  }
+                >
+                  <Route index element={<Navigate replace to="dashboard" />} />
+                  <Route path="dashboard" element={<Dashboard />} />
+                  <Route path="account" element={<Account />} />
+                  <Route path="bookings" element={<Bookings />} />
+                  <Route path="bookings/:bookingId" element={<Booking />} />
+                  <Route path="checkin/:bookingId" element={<Checkin />} />
+                  <Route path="settings" element={<Settings />} />
+                  <Route path="users" element={<Users />} />
+                  <Route path="cabins" element={<Cabins />} />
+                </Route>
+                <Route path="login" element={<Login />} />
               </Route>
-              <Route path="login" element={<Login />} />
-            </Route>
 
-            <Route path="*" element={<PageNotFound />} />
-          </Routes>
+              <Route path="*" element={<PageNotFound />} />
+            </Routes>
+          </DateProvider>
         </BrowserRouter>
 
         <Toaster

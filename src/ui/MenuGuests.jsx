@@ -9,6 +9,8 @@ import {
   incrementPets,
 } from "../features/bookings/guests/bookingSlice";
 import { HiOutlineMinus, HiOutlinePlus } from "react-icons/hi2";
+import { useSearchParams } from "react-router-dom";
+import { useMySearchParams } from "../hooks/useMySearchParams";
 
 const Table = styled.div``;
 
@@ -52,14 +54,33 @@ const Button = styled.button`
 
 const Value = styled.div``;
 
-function Row({ titleLabel, value, incFn, decFn, max, min }) {
+function Row({
+  titleLabel,
+  value,
+  isValueFromSearchParam,
+  incFn,
+  decFn,
+  max,
+  min,
+}) {
   const dispatch = useDispatch();
+  const [searchParams, setSearchParams] = useSearchParams();
 
-  function handleInc(incFn) {
-    return () => dispatch(incFn());
+  function handleClick(fn) {
+    return () => {
+      dispatch(fn());
+      // searchParams.set({ [titleLabel.toLowerCase()]: value });
+      // setSearchParams(searchParams);
+    };
   }
-  function handleDec(decFn) {
-    return () => dispatch(decFn());
+
+  function incrementSearchParam() {
+    searchParams.set(titleLabel.toLowerCase(), (value += 1));
+    setSearchParams(searchParams);
+  }
+  function decrementSearchParam() {
+    searchParams.set(titleLabel.toLowerCase(), (value -= 1));
+    setSearchParams(searchParams);
   }
 
   let description;
@@ -81,13 +102,23 @@ function Row({ titleLabel, value, incFn, decFn, max, min }) {
         <TiltleDesc>{description}</TiltleDesc>
       </Section>
       <Stepper>
-        <Button onClick={handleDec(decFn)} disabled={value <= min}>
+        <Button
+          onClick={
+            !isValueFromSearchParam ? handleClick(decFn) : decrementSearchParam
+          }
+          disabled={value <= min}
+        >
           <span>
             <HiOutlineMinus />
           </span>
         </Button>
         <Value>{value}</Value>
-        <Button onClick={handleInc(incFn)} disabled={value >= max}>
+        <Button
+          onClick={
+            !isValueFromSearchParam ? handleClick(incFn) : incrementSearchParam
+          }
+          disabled={value >= max}
+        >
           <span>
             <HiOutlinePlus />
           </span>
@@ -101,12 +132,14 @@ function MenuGuests() {
   const { adults, children, pets } = useSelector(
     (state) => state.booking.guests
   );
+  const { search } = useMySearchParams();
 
   return (
     <Table role="table">
       <Row
-        titleLabel="Adult"
-        value={adults}
+        titleLabel="Adults"
+        value={search?.adults ? Number(search.adults) : adults}
+        isValueFromSearchParam={search?.adults !== undefined}
         min={1}
         max={30}
         incFn={incrementAdults}
@@ -114,7 +147,8 @@ function MenuGuests() {
       />
       <Row
         titleLabel="Children"
-        value={children}
+        value={search?.children ? Number(search.children) : children}
+        isValueFromSearchParam={search?.children !== undefined}
         min={0}
         max={10}
         incFn={incrementChildren}
@@ -122,7 +156,8 @@ function MenuGuests() {
       />
       <Row
         titleLabel="Pets"
-        value={pets}
+        value={search?.pets ? Number(search.pets) : pets}
+        isValueFromSearchParam={search?.pets !== undefined}
         min={0}
         max={5}
         incFn={incrementPets}

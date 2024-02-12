@@ -1,7 +1,11 @@
 import styled from "styled-components";
 import Button from "../Button";
 import { RoomSearchCard } from "./RoomSearchCard";
-import { useNavigate } from "react-router-dom";
+import {
+  createSearchParams,
+  useNavigate,
+  useSearchParams,
+} from "react-router-dom";
 
 const Container = styled.div`
   display: flex;
@@ -22,15 +26,21 @@ const ReserveButton = styled(Button)`
   }
 `;
 
-export function RoomSidebar({
-  cabin,
-  isDateUnavailable,
-  initialDate,
-  controlledDate,
-}) {
+export function RoomSidebar({ cabin, isDateUnavailable, controlledDate }) {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  let searchObj = {};
+
+  for (let param of searchParams) {
+    const [key, value] = [param[0], param[1]];
+    searchObj[key] = value;
+  }
+
   function handleClick() {
-    navigate("/book");
+    navigate({
+      pathname: `/book/${cabin.id}`,
+      search: createSearchParams(searchObj).toString(),
+    });
   }
 
   return (
@@ -40,7 +50,6 @@ export function RoomSidebar({
       </PriceTitle>
       <RoomSearchCard
         isDateUnavailable={isDateUnavailable}
-        initialDate={initialDate}
         controlledDate={controlledDate}
       />
       <ReserveButton onClick={handleClick}>Reserve</ReserveButton>

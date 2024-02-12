@@ -2,7 +2,6 @@ import styled from "styled-components";
 import { useDispatch } from "react-redux";
 import { useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
-import { getLocalTimeZone, today } from "@internationalized/date";
 
 import DateRangeCalendar from "../date_range_calendar/DateRangeCalender.jsx";
 import { RoomSidebar } from "./RoomSidebar.jsx";
@@ -61,7 +60,6 @@ export function RoomBookDetail({ cabin }) {
     <BookDetails>
       <DateRangeCalendar
         aria-label="date calendar"
-        minValue={today(getLocalTimeZone())}
         isDateUnavailable={isDateUnavailable(disabledRange)}
         controlledDate={value}
       />

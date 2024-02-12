@@ -3,7 +3,6 @@ import { useParams } from "react-router-dom";
 import useCabin from "../features/cabins/useCabin.js";
 import { Hero } from "../ui/Hero.jsx";
 import { RoomBookDetail } from "../ui/roomdetail/RoomBookDetail.jsx";
-import { DateProvider } from "../context/DateContext.jsx";
 
 function RoomsDetail() {
   const { roomId } = useParams();
@@ -14,9 +13,8 @@ function RoomsDetail() {
     <>
       <div>{roomId}</div>
       <Hero cabin={cabin} isLoading={isLoading} />
-      <DateProvider>
-        <RoomBookDetail cabin={cabin} />
-      </DateProvider>
+
+      <RoomBookDetail cabin={cabin} />
     </>
   );
 }

@@ -36,11 +36,13 @@ function DateProvider({ children }) {
       formEnd = end?.add({ days: 1 }).toString();
     }
     if (formStart && formEnd) {
-      setSearchParams({ checkin: formStart, chekout: formEnd });
+      searchParams.set("checkin", formStart);
+      searchParams.set("checkout", formEnd);
+      setSearchParams(searchParams);
     }
     dispatch(checkinAt(formStart));
     dispatch(checkoutAt(formEnd));
-  }, [start, end, dispatch, setSearchParams]);
+  }, [start, end, dispatch, setSearchParams, searchParams]);
 
   return (
     <DateContext.Provider value={{ date, setDate }}>
