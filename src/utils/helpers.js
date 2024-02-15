@@ -1,3 +1,4 @@
+import { getLocalTimeZone, parseDate, today } from "@internationalized/date";
 import {
   differenceInCalendarDays,
   format,
@@ -103,6 +104,19 @@ export function isDateUnavailable(disabledRanges) {
       (interval) =>
         date.compare(interval[0]) >= 0 && date.compare(interval[1]) < 0
     );
+}
+// only used for internationized date, since compare is the method of this class
+export function isDateInRange(date, disabledRanges) {
+  if (typeof date === "string") date = parseDate(date);
+  return isDateUnavailable(disabledRanges)(date);
+}
+
+//only used for internationized date, since compare is the method of this class
+export function isEqualAfterToday(date) {
+  if (typeof date === "string") date = parseDate(date);
+
+  const result = date.compare(today(getLocalTimeZone())) >= 0;
+  return result;
 }
 
 export function getParamsStr(filterObj) {

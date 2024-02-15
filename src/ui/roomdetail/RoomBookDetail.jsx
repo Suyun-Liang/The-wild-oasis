@@ -29,29 +29,29 @@ export function RoomBookDetail({ cabin }) {
   const [searchParams] = useSearchParams();
 
   //initialize global states with params
-  useEffect(() => {
-    searchParams.forEach((val, param) => {
-      switch (param) {
-        case "checkin":
-          dispatch(checkinAt(val));
-          break;
-        case "checkout":
-          dispatch(checkoutAt(val));
-          break;
-        case "adults":
-          dispatch(updateAdults(val));
-          break;
-        case "children":
-          dispatch(updateChildren(val));
-          break;
-        case "pets":
-          dispatch(updatePets(val));
-          break;
-        default:
-          break;
-      }
-    });
-  }, [searchParams, dispatch]);
+  // useEffect(() => {
+  //   searchParams.forEach((val, param) => {
+  //     switch (param) {
+  //       case "checkin":
+  //         dispatch(checkinAt(val));
+  //         break;
+  //       case "checkout":
+  //         dispatch(checkoutAt(val));
+  //         break;
+  //       case "adults":
+  //         dispatch(updateAdults(val));
+  //         break;
+  //       case "children":
+  //         dispatch(updateChildren(val));
+  //         break;
+  //       case "pets":
+  //         dispatch(updatePets(val));
+  //         break;
+  //       default:
+  //         break;
+  //     }
+  //   });
+  // }, [searchParams, dispatch]);
 
   const { dates: disabledRange } = useUnavailableDatesIn(cabin?.id, {
     isDateInterval: true,

@@ -6,6 +6,7 @@ import {
   useNavigate,
   useSearchParams,
 } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 const Container = styled.div`
   display: flex;
@@ -29,6 +30,7 @@ const ReserveButton = styled(Button)`
 export function RoomSidebar({ cabin, isDateUnavailable, controlledDate }) {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const guests = useSelector((state) => state.booking.guests);
   let searchObj = {};
 
   for (let param of searchParams) {
@@ -39,7 +41,7 @@ export function RoomSidebar({ cabin, isDateUnavailable, controlledDate }) {
   function handleClick() {
     navigate({
       pathname: `/book/${cabin.id}`,
-      search: createSearchParams(searchObj).toString(),
+      search: createSearchParams({ ...guests, ...searchObj }).toString(),
     });
   }
 

@@ -253,6 +253,10 @@ function CreateBookingForm({ onCloseModal }) {
           disabled={isLoading}
           {...register("nationalID", {
             required: "This field is required",
+            pattern: {
+              value: /^[a-zA-Z0-9_]+$/,
+              message: "Please provide a valid national ID",
+            },
           })}
         />
       </FormRow>

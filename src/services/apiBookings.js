@@ -81,7 +81,7 @@ export async function getUnavailableDatesInCabin(
   isDateInterval = false
 ) {
   if (!cabinId) return [];
-
+  cabinId = Number(cabinId);
   let datesArr = [];
   try {
     const cabinBookingData = await getCabinBooking(cabinId, {

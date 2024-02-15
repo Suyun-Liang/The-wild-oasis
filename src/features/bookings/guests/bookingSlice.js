@@ -3,7 +3,7 @@ import { createSlice } from "@reduxjs/toolkit";
 const initialState = {
   checkin: null,
   checkout: null,
-  guests: { adults: 2, children: 0, pets: 0 },
+  guests: { adults: 1, children: 0, pets: 0 },
 };
 
 const bookingSlice = createSlice({

@@ -10,6 +10,7 @@ import MenuGuests from "./MenuGuests";
 
 import { formatDate, getParamsStr } from "../utils/helpers";
 import { PopoverTrigger } from "./date_range_calendar/PopoverTrigger";
+import { useMySearchParams } from "../hooks/useMySearchParams";
 
 const Container = styled.div`
   padding-bottom: 15px;
@@ -114,13 +115,27 @@ export function CheckinOutCard({ isDateUnavailable, controlledDate }) {
 
 export function GuestCard() {
   const {
-    guests: { adults, children, pets },
-  } = useSelector((state) => state.booking);
+    adults: stateAdults,
+    children: stateChildren,
+    pets: statePets,
+  } = useSelector((state) => state.booking.guests);
 
-  const guestNum = adults + children;
+  const {
+    search: {
+      adults: searchAdults,
+      children: searchChildren,
+      pets: searchPets,
+    },
+  } = useMySearchParams();
+
+  let adults = searchAdults !== undefined ? searchAdults : stateAdults;
+  let children = searchChildren !== undefined ? searchChildren : stateChildren;
+  let pets = searchPets !== undefined ? searchPets : statePets;
+
+  const guestNum = Number(adults) + Number(children);
   const guestLabel =
     `${guestNum} ${guestNum === 1 ? "guest" : "guests"} ` +
-    `${pets > 0 ? `, ${pets} ${pets === 1 ? "pet" : "pets"}` : ""}`;
+    `${Number(pets) > 0 ? `, ${pets} ${pets === 1 ? "pet" : "pets"}` : ""}`;
 
   return (
     <PopoverTrigger element={<MenuGuests />} type="button">

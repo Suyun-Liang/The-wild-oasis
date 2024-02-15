@@ -5,6 +5,7 @@ import {
   CalendarGrid,
   CalendarCell,
   Heading,
+  Text,
 } from "react-aria-components";
 import { useDispatch } from "react-redux";
 import styled from "styled-components";
@@ -13,6 +14,8 @@ import {
   checkoutAt,
 } from "../../features/bookings/guests/bookingSlice";
 import { getLocalTimeZone, today } from "@internationalized/date";
+import { useUnavailableDatesIn } from "../../features/bookings/useBooking";
+import { useParams } from "react-router-dom";
 
 const StyledRangeCalendar = styled(RangeCalendar)`
   width: fit-content;
@@ -25,17 +28,17 @@ const StyledRangeCalendar = styled(RangeCalendar)`
     margin: 0 4px 1.75rem 4px;
   }
 
-  & > div {
-    display: flex;
-    gap: 3.5rem;
-  }
-
   & table {
     border-collapse: collapse;
 
     & td {
       padding: 2px 0;
     }
+  }
+
+  [slot="errorMessage"] {
+    font-size: 1.4rem;
+    color: var(--color-red-700);
   }
 `;
 
@@ -108,15 +111,37 @@ const StyledCalendarCell = styled(CalendarCell)`
     text-decoration: line-through;
     color: var(--color-grey-300);
   }
+
+  &[data-invalid] {
+    background-color: var(--color-red-700);
+    color: var(--color-grey-100);
+  }
+`;
+
+const Body = styled.div`
+  display: flex;
+  flex-direction: column;
+
+  gap: 20px;
+
+  & > div {
+    display: flex;
+    gap: 35px;
+  }
 `;
 
 function DateRangeCalender(props) {
   const [date, setDate] = useState(null);
   const dispatch = useDispatch();
+  let { roomId } = useParams();
+  const { dates: disabledRange } = useUnavailableDatesIn(roomId, {
+    isDateInterval: true,
+  });
+  const value = props.controlledDate?.date || date;
+  const onChangeValue = props.controlledDate?.setDate || setDate;
 
   const start = date?.start;
   const end = date?.end;
-
   useEffect(() => {
     let formStart = start?.toString();
     let formEnd = end?.toString();
@@ -128,11 +153,28 @@ function DateRangeCalender(props) {
     dispatch(checkoutAt(formEnd));
   }, [start, end, dispatch]);
 
+  const isSelectedRangeUnavailable = disabledRange?.some(
+    (interval) =>
+      value?.start?.compare(interval[1]) < 0 &&
+      value?.end?.compare(interval[0]) >= 0
+  );
+
+  const isSelectedRangeInpast =
+    value?.start?.compare(today(getLocalTimeZone())) < 0;
+
+  let isInvalid = isSelectedRangeInpast || isSelectedRangeUnavailable;
+
+  const errorMessage =
+    props.isInvalid || isInvalid
+      ? "Invalid date, please choose again"
+      : undefined;
+
   return (
     <StyledRangeCalendar
       minValue={today(getLocalTimeZone())}
-      value={props.controlledDate?.date || date}
-      onChange={props.controlledDate?.setDate || setDate}
+      value={value}
+      onChange={onChangeValue}
+      errorMessage={errorMessage}
       {...props}
     >
       <header>
@@ -140,18 +182,19 @@ function DateRangeCalender(props) {
         <StyledHeading />
         <StyledButton slot="next">▶</StyledButton>
       </header>
-      <div>
-        <CalendarGrid>
-          {(date) => <StyledCalendarCell date={date} />}
-        </CalendarGrid>
-        {props.visibleDuration?.months === 2 && (
-          <CalendarGrid offset={{ months: 1 }}>
+      <Body>
+        <div>
+          <CalendarGrid>
             {(date) => <StyledCalendarCell date={date} />}
           </CalendarGrid>
-        )}
-
-        {/* {errorMessage && <Text slot="errorMessage">{errorMessage}</Text>} */}
-      </div>
+          {props.visibleDuration?.months === 2 && (
+            <CalendarGrid offset={{ months: 1 }}>
+              {(date) => <StyledCalendarCell date={date} />}
+            </CalendarGrid>
+          )}
+        </div>
+        {errorMessage && <Text slot="errorMessage">{errorMessage}</Text>}
+      </Body>
     </StyledRangeCalendar>
   );
 }

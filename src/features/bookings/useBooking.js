@@ -21,7 +21,10 @@ export function useBooking() {
   return { booking, isLoading, error };
 }
 
-export function useUnavailableDatesIn(cabinId, { isDateInterval } = {}) {
+export function useUnavailableDatesIn(
+  cabinId,
+  { isDateInterval } = { isDateInterval: false }
+) {
   const { data: dates, isLoading } = useQuery({
     queryKey: ["unavailable dates", cabinId],
     queryFn: () => getUnavailableDatesInCabin(cabinId, isDateInterval),

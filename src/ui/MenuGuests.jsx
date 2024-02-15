@@ -132,36 +132,61 @@ function MenuGuests() {
   const { adults, children, pets } = useSelector(
     (state) => state.booking.guests
   );
+
   const { search } = useMySearchParams();
+
+  const action = {
+    adults: { incrementAdults, decrementAdults },
+    children: { incrementChildren, decrementChildren },
+    pets: { incrementPets, decrementPets },
+  };
 
   return (
     <Table role="table">
       <Row
         titleLabel="Adults"
-        value={search?.adults ? Number(search.adults) : adults}
+        value={
+          search?.adults
+            ? !(Number(search.adults) > 0)
+              ? 1
+              : Number(search.adults)
+            : adults
+        }
         isValueFromSearchParam={search?.adults !== undefined}
         min={1}
         max={30}
-        incFn={incrementAdults}
-        decFn={decrementAdults}
+        incFn={action.adults.incrementAdults}
+        decFn={action.adults.decrementAdults}
       />
       <Row
         titleLabel="Children"
-        value={search?.children ? Number(search.children) : children}
+        value={
+          search?.children
+            ? !(Number(search.children) >= 0)
+              ? 0
+              : Number(search.children)
+            : children
+        }
         isValueFromSearchParam={search?.children !== undefined}
         min={0}
         max={10}
-        incFn={incrementChildren}
-        decFn={decrementChildren}
+        incFn={action.children.incrementChildren}
+        decFn={action.children.decrementChildren}
       />
       <Row
         titleLabel="Pets"
-        value={search?.pets ? Number(search.pets) : pets}
+        value={
+          search?.pets
+            ? !(Number(search.pets) >= 0)
+              ? 0
+              : Number(search.pets)
+            : pets
+        }
         isValueFromSearchParam={search?.pets !== undefined}
         min={0}
         max={5}
-        incFn={incrementPets}
-        decFn={decrementPets}
+        incFn={action.pets.incrementPets}
+        decFn={action.pets.decrementPets}
       />
     </Table>
   );
