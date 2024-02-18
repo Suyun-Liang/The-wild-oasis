@@ -7,6 +7,7 @@ import {
   useSearchParams,
 } from "react-router-dom";
 import { useSelector } from "react-redux";
+import PriceDetail from "../PriceDetail";
 
 const Container = styled.div`
   display: flex;
@@ -27,7 +28,7 @@ const ReserveButton = styled(Button)`
   }
 `;
 
-export function RoomSidebar({ cabin, isDateUnavailable, controlledDate }) {
+export function RoomSidebar({ cabin, controlledDate }) {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const guests = useSelector((state) => state.booking.guests);
@@ -50,12 +51,9 @@ export function RoomSidebar({ cabin, isDateUnavailable, controlledDate }) {
       <PriceTitle>
         €{cabin?.regularPrice} <span>night</span>
       </PriceTitle>
-      <RoomSearchCard
-        isDateUnavailable={isDateUnavailable}
-        controlledDate={controlledDate}
-      />
+      <RoomSearchCard controlledDate={controlledDate} />
       <ReserveButton onClick={handleClick}>Reserve</ReserveButton>
-      <div>Price detail</div>
+      <PriceDetail />
     </Container>
   );
 }

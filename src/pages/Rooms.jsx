@@ -8,6 +8,7 @@ import { Card } from "../ui/Card";
 import LoadingCards from "../ui/LoadingCards";
 import { getISOStringWithHour } from "../utils/helpers";
 import { ROOM_PAGE_SIZE } from "../utils/constants";
+import { useMySearchParams } from "../hooks/useMySearchParams";
 
 const Wrapper = styled.div`
   display: flex;
@@ -29,16 +30,7 @@ const Container = styled.div`
 Container.defaultProps = { $visible: true };
 
 function RoomsContent() {
-  const [searchParams] = useSearchParams();
-  const search = {};
-
-  searchParams.forEach((val, param) => {
-    if (Object.prototype.hasOwnProperty.call(search, param)) {
-      search[param] += `,${val}`;
-    } else {
-      search[param] = val;
-    }
-  });
+  const { search } = useMySearchParams();
 
   const checkin = getISOStringWithHour(search?.checkin);
   const checkout = getISOStringWithHour(search?.checkout);

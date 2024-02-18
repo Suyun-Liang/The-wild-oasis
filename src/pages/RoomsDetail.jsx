@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import useCabin from "../features/cabins/useCabin.js";
 import { Hero } from "../ui/Hero.jsx";
 import { RoomBookDetail } from "../ui/roomdetail/RoomBookDetail.jsx";
+import { DateProvider } from "../context/DateContext.jsx";
 
 function RoomsDetail() {
   const { roomId } = useParams();
@@ -11,10 +12,12 @@ function RoomsDetail() {
 
   return (
     <>
-      <div>{roomId}</div>
-      <Hero cabin={cabin} isLoading={isLoading} />
+      <DateProvider>
+        <div>{roomId}</div>
+        <Hero cabin={cabin} isLoading={isLoading} />
 
-      <RoomBookDetail cabin={cabin} />
+        <RoomBookDetail cabin={cabin} />
+      </DateProvider>
     </>
   );
 }

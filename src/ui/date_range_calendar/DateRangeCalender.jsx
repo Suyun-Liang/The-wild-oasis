@@ -15,7 +15,9 @@ import {
 } from "../../features/bookings/guests/bookingSlice";
 import { getLocalTimeZone, today } from "@internationalized/date";
 import { useUnavailableDatesIn } from "../../features/bookings/useBooking";
-import { useParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
+import { isDateUnavailable } from "../../utils/helpers";
+import useSettings from "../../features/settings/useSettings";
 
 const StyledRangeCalendar = styled(RangeCalendar)`
   width: fit-content;
@@ -132,48 +134,72 @@ const Body = styled.div`
 
 function DateRangeCalender(props) {
   const [date, setDate] = useState(null);
+  const [searchParams, setSearchParams] = useSearchParams();
   const dispatch = useDispatch();
   let { roomId } = useParams();
+  roomId = Number(roomId);
   const { dates: disabledRange } = useUnavailableDatesIn(roomId, {
     isDateInterval: true,
   });
+  const {
+    isLoading: isLoadingSettings,
+    settings: { minBookingLength, maxBookingLength } = {},
+  } = useSettings();
+
   const value = props.controlledDate?.date || date;
   const onChangeValue = props.controlledDate?.setDate || setDate;
+  const isDateFromProps = props.controlledDate !== undefined;
 
-  const start = date?.start;
-  const end = date?.end;
-  useEffect(() => {
+  function handleChange(date) {
+    const start = date?.start;
+    const end = date?.end;
     let formStart = start?.toString();
     let formEnd = end?.toString();
 
     if (formStart == formEnd) {
       formEnd = end?.add({ days: 1 }).toString();
     }
-    dispatch(checkinAt(formStart));
-    dispatch(checkoutAt(formEnd));
-  }, [start, end, dispatch]);
 
+    if (isDateFromProps) {
+      searchParams.set("checkin", formStart);
+      searchParams.set("checkout", formEnd);
+      setSearchParams(searchParams);
+    } else {
+      dispatch(checkinAt(formStart));
+      dispatch(checkoutAt(formEnd));
+    }
+    onChangeValue(date);
+  }
   const isSelectedRangeUnavailable = disabledRange?.some(
     (interval) =>
       value?.start?.compare(interval[1]) < 0 &&
       value?.end?.compare(interval[0]) >= 0
   );
-
   const isSelectedRangeInpast =
     value?.start?.compare(today(getLocalTimeZone())) < 0;
-
   let isInvalid = isSelectedRangeInpast || isSelectedRangeUnavailable;
+  let isLessThanMinLength =
+    minBookingLength && value?.end?.compare(value?.start) < minBookingLength;
+  let isLongerThanMaxLength =
+    maxBookingLength && value?.end?.compare(value?.start) > maxBookingLength;
 
-  const errorMessage =
-    props.isInvalid || isInvalid
-      ? "Invalid date, please choose again"
-      : undefined;
+  const errorMessage = isInvalid
+    ? "Invalid date, please choose again"
+    : isLessThanMinLength
+    ? `duration stay should be at least ${minBookingLength} day`
+    : isLongerThanMaxLength
+    ? `duration stay should be at most ${maxBookingLength} day`
+    : undefined;
 
   return (
     <StyledRangeCalendar
       minValue={today(getLocalTimeZone())}
       value={value}
-      onChange={onChangeValue}
+      onChange={handleChange}
+      isDateUnavailable={
+        roomId !== undefined ? isDateUnavailable(disabledRange) : () => false
+      }
+      isInvalid={isLessThanMinLength || isLongerThanMaxLength}
       errorMessage={errorMessage}
       {...props}
     >

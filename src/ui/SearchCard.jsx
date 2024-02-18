@@ -87,7 +87,7 @@ export function SearchCard() {
   );
 }
 
-export function CheckinOutCard({ isDateUnavailable, controlledDate }) {
+export function CheckinOutCard({ controlledDate }) {
   const { checkin, checkout } = useSelector((state) => state.booking);
 
   const checkinLabel = formatDate(checkin, "MMM d");
@@ -101,7 +101,6 @@ export function CheckinOutCard({ isDateUnavailable, controlledDate }) {
         <DateRangeCalender
           minValue={todayObj}
           visibleDuration={{ months: 2 }}
-          isDateUnavailable={isDateUnavailable}
           controlledDate={controlledDate}
         />
       }

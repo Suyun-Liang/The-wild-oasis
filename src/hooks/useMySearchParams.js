@@ -2,11 +2,15 @@ import { useSearchParams } from "react-router-dom";
 
 export function useMySearchParams() {
   const [searchParams] = useSearchParams();
-  let search = {};
-  for (let param of searchParams) {
-    const [key, value] = [param[0], param[1]];
-    search[key] = value;
-  }
+  const search = {};
+
+  searchParams.forEach((val, param) => {
+    if (Object.prototype.hasOwnProperty.call(search, param)) {
+      search[param] += `,${val}`;
+    } else {
+      search[param] = val;
+    }
+  });
 
   return { search };
 }

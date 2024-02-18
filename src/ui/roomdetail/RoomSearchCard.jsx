@@ -8,13 +8,10 @@ const Container = styled.div`
   min-width: 300px;
 `;
 
-export function RoomSearchCard({ isDateUnavailable, controlledDate }) {
+export function RoomSearchCard({ controlledDate }) {
   return (
     <Container>
-      <CheckinOutCard
-        isDateUnavailable={isDateUnavailable}
-        controlledDate={controlledDate}
-      />
+      <CheckinOutCard controlledDate={controlledDate} />
       <GuestCard />
     </Container>
   );
