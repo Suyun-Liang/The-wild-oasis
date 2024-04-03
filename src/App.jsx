@@ -8,7 +8,7 @@ import Home from "./pages/Home";
 import Rooms from "./pages/Rooms";
 import RoomsDetail from "./pages/RoomsDetail";
 import Contactus from "./pages/Contactus";
-import Signin from "./pages/Signin";
+import Signup from "./pages/Signup";
 import { default as ClientLogin } from "./pages/Login";
 import { default as ClientBooking } from "./pages/Booking";
 
@@ -52,7 +52,7 @@ function App() {
                 <Route path=":roomId" element={<RoomsDetail />} />
               </Route>
               <Route path="/contactus" element={<Contactus />} />
-              <Route path="/signin" element={<Signin />} />
+              <Route path="/signup" element={<Signup />} />
               <Route path="/login" element={<ClientLogin />} />
               <Route path="/book/:roomId" element={<ClientBooking />} />
             </Route>
@@ -91,7 +91,7 @@ function App() {
               duration: 3000,
             },
             error: {
-              duration: 5000,
+              duration: 6000,
             },
             style: {
               fontSize: "16px",

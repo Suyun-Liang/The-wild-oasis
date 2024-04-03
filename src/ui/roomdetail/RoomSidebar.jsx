@@ -1,13 +1,11 @@
 import styled from "styled-components";
 import Button from "../Button";
 import { RoomSearchCard } from "./RoomSearchCard";
-import {
-  createSearchParams,
-  useNavigate,
-  useSearchParams,
-} from "react-router-dom";
+import { createSearchParams, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import PriceDetail from "../PriceDetail";
+import { useMySearchParams } from "../../hooks/useMySearchParams";
+import AddBreakFast from "../AddBreakFast";
 
 const Container = styled.div`
   display: flex;
@@ -30,19 +28,13 @@ const ReserveButton = styled(Button)`
 
 export function RoomSidebar({ cabin, controlledDate }) {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
+  const { search } = useMySearchParams();
   const guests = useSelector((state) => state.booking.guests);
-  let searchObj = {};
-
-  for (let param of searchParams) {
-    const [key, value] = [param[0], param[1]];
-    searchObj[key] = value;
-  }
 
   function handleClick() {
     navigate({
       pathname: `/book/${cabin.id}`,
-      search: createSearchParams({ ...guests, ...searchObj }).toString(),
+      search: createSearchParams({ ...guests, ...search }).toString(),
     });
   }
 
@@ -53,6 +45,7 @@ export function RoomSidebar({ cabin, controlledDate }) {
       </PriceTitle>
       <RoomSearchCard controlledDate={controlledDate} />
       <ReserveButton onClick={handleClick}>Reserve</ReserveButton>
+      <AddBreakFast />
       <PriceDetail />
     </Container>
   );

@@ -1,6 +1,7 @@
 import { NavLink } from "react-router-dom";
 import styled from "styled-components";
 import Logo from "./Logo";
+import MenuUser from "./MenuUser";
 
 const StyledNav = styled.nav`
   width: 100%;
@@ -62,8 +63,7 @@ function HomeNav() {
         <StyledHomeNavLink to="/">Home</StyledHomeNavLink>
         <StyledHomeNavLink to="/rooms">Rooms</StyledHomeNavLink>
         <StyledHomeNavLink to="/contactus">Contact us</StyledHomeNavLink>
-        <StyledHomeNavLink to="/signin">Sign in</StyledHomeNavLink>
-        <StyledHomeNavLink to="/login">Register</StyledHomeNavLink>
+        <MenuUser />
       </NavList>
     </StyledNav>
   );

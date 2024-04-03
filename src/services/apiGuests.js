@@ -42,7 +42,7 @@ export async function CreateGetGuest(newGuestObj) {
     }
   }
 
-  return newGuest || guest;
+  return { guest: newGuest || guest, isExistGuest: error?.code === "23505" };
 }
 
 export async function deleteGuest(id) {

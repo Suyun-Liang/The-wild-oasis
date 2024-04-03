@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 import Button from "../../ui/Button";
 import Form from "../../ui/Form";
@@ -8,7 +9,8 @@ import SpinnerMini from "../../ui/SpinnerMini";
 
 import useLogin from "./useLogin";
 
-function LoginForm() {
+function LoginForm({ from, onCloseModal }) {
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const { login, isLoggingIn } = useLogin();
@@ -22,6 +24,13 @@ function LoginForm() {
         onSettled: () => {
           setEmail("");
           setPassword("");
+        },
+        onSuccess: () => {
+          if (from === "admin")
+            navigate("/employee/dashboard", { replace: true });
+          if (from === "user") {
+            onCloseModal();
+          }
         },
       }
     );

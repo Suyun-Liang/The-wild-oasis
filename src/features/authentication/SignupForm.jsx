@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import Button from "../../ui/Button";
 import Form from "../../ui/Form";
 import FormRow from "../../ui/FormRow";
-import Input from "../../ui/Input";
+import Input, { PwInputBox } from "../../ui/Input";
 import useSignup from "./useSignup";
 
 // Email regex: /\S+@\S+\.\S+/
@@ -14,7 +14,7 @@ function SignupForm() {
   const { errors } = formState;
   function onSubmit({ fullName, email, password }) {
     signup(
-      { fullName, email, password },
+      { fullName, email, password, role: "admin" },
       {
         onSettled: () => reset(),
       }
@@ -51,31 +51,35 @@ function SignupForm() {
         label="Password (min 8 characters)"
         error={errors?.password?.message}
       >
-        <Input
-          type="password"
-          id="password"
-          disabled={isSigningUp}
-          {...register("password", {
-            required: "This field is required",
-            minLength: {
-              value: 8,
-              message: "Password needs a minimum of 8 characters",
-            },
-          })}
-        />
+        <PwInputBox>
+          <Input
+            type="password"
+            id="password"
+            disabled={isSigningUp}
+            {...register("password", {
+              required: "This field is required",
+              minLength: {
+                value: 8,
+                message: "Password needs a minimum of 8 characters",
+              },
+            })}
+          />
+        </PwInputBox>
       </FormRow>
 
       <FormRow label="Repeat password" error={errors?.passwordConfirm?.message}>
-        <Input
-          type="password"
-          id="passwordConfirm"
-          disabled={isSigningUp}
-          {...register("passwordConfirm", {
-            required: "This field is required",
-            validate: (value) =>
-              value === getValues().password || "Passwords need to match",
-          })}
-        />
+        <PwInputBox>
+          <Input
+            type="password"
+            id="passwordConfirm"
+            disabled={isSigningUp}
+            {...register("passwordConfirm", {
+              required: "This field is required",
+              validate: (value) =>
+                value === getValues().password || "Passwords need to match",
+            })}
+          />
+        </PwInputBox>
       </FormRow>
 
       <FormRow>

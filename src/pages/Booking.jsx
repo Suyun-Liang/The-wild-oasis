@@ -26,7 +26,7 @@ import {
 } from "../utils/helpers";
 import { useUnavailableDatesIn } from "../features/bookings/useBooking";
 import { DateProvider, useDate } from "../context/DateContext";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
 import { getUnavailableDatesInCabin } from "../services/apiBookings";
 import { getLocalTimeZone, parseDate, today } from "@internationalized/date";
@@ -37,6 +37,10 @@ import useSettings from "../features/settings/useSettings";
 import useDeleteGuest from "../features/bookings/useDeleteGuest";
 import useCreateBooking from "../features/bookings/useCreateBooking";
 import PriceDetail from "../ui/PriceDetail";
+import {
+  addBreakfast,
+  removeBreakfast,
+} from "../features/bookings/guests/bookingSlice";
 
 const Container = styled.div``;
 const Title = styled.h1``;
@@ -51,6 +55,18 @@ const StyledEditButton = styled.button`
     text-decoration-thickness: 2px;
   }
 `;
+
+// const Checkbox = styled.input`
+//   height: 2.4rem;
+//   width: 2.4rem;
+//   outline-offset: 2px;
+//   transform-origin: 0;
+//   accent-color: var(--color-brand-600);
+
+//   &:disabled {
+//     accent-color: var(--color-brand-600);
+//   }
+// `;
 
 function Booking() {
   return (
@@ -72,6 +88,8 @@ function CreateBookingForm() {
   let { roomId } = useParams();
   roomId = Number(roomId);
   const value = useDate();
+  const dispatch = useDispatch();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   // value of guests are from search params, if not exist, look at global state
   const {
@@ -86,6 +104,7 @@ function CreateBookingForm() {
       pets: searchPets,
       checkin,
       checkout,
+      hasBreakfast,
     },
   } = useMySearchParams();
   let adults = searchAdults !== undefined ? searchAdults : stateAdults;
@@ -118,12 +137,28 @@ function CreateBookingForm() {
       numGuests: guestNum,
       startDate: checkin,
       endDate: checkout,
-      hasBreakfast: false,
+      hasBreakfast:
+        hasBreakfast === undefined ? false : JSON.parse(hasBreakfast),
       isPaid: false,
       cabinId: roomId,
     },
     mode: "onChange",
   });
+
+  const { onChange: onChangeHasBreakfast } = register("hasBreakfast");
+
+  function CombinedOnChange(e) {
+    onChangeHasBreakfast(e);
+    const value = e.target.checked;
+    if (value) {
+      dispatch(addBreakfast());
+      searchParams.set("hasBreakfast", true);
+    } else {
+      dispatch(removeBreakfast());
+      searchParams.set("hasBreakfast", false);
+    }
+    setSearchParams(searchParams);
+  }
 
   useEffect(() => {
     trigger(["startDate", "endDate", "numGuests"]);
@@ -135,7 +170,6 @@ function CreateBookingForm() {
   }, [checkin, checkout, guestNum, setValue, trigger]);
 
   async function onSubmit(data) {
-    console.log(data);
     const {
       firstName,
       lastName,
@@ -197,6 +231,8 @@ function CreateBookingForm() {
             extrasPrice,
             totalPrice,
           };
+
+          console.log(bookingData);
 
           //2.2 create booking after guest created/selected successfully, or delete user
           // createBooking(bookingData, {
@@ -396,11 +432,15 @@ function CreateBookingForm() {
               />
             </FormRow>
 
-            <FormRow label="Add breakfast">
+            <FormRow
+              label="Add breakfast"
+              error={errors?.hasBreakfast?.message}
+            >
               <Checkbox
                 type="checkbox"
                 disabled={false}
-                // {...register("hasBreakfast")}
+                {...register("hasBreakfast")}
+                onChange={CombinedOnChange}
               />
             </FormRow>
 

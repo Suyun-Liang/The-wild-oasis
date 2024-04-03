@@ -142,7 +142,7 @@ function CreateBookingForm({ onCloseModal }) {
 
       // 1.1 select or create a guest based on their nationalID
       createOrGetGuest(guestData, {
-        onSuccess: ({ id: guestId }) => {
+        onSuccess: ({ guest: { id: guestId } }) => {
           //2. Prepare booking data
           const numNights = subtractDates(endDate, startDate);
           const cabinPrice =
@@ -169,7 +169,7 @@ function CreateBookingForm({ onCloseModal }) {
             totalPrice,
           };
           //2.2 create booking after guest created/selected successfully, or delete user
-          createBooking(bookingData, {
+          /*           createBooking(bookingData, {
             onSuccess: () => {
               reset();
               onCloseModal();
@@ -177,7 +177,7 @@ function CreateBookingForm({ onCloseModal }) {
             onError: () => {
               deleteGuest(guestId);
             },
-          });
+          }); */
         },
       });
     } catch (error) {
@@ -334,11 +334,13 @@ function CreateBookingForm({ onCloseModal }) {
           minDate={new Date()}
           maxDate={endOfMonth(addMonths(new Date(), 6))}
           disabledDates={
-            isLoadingDates || unavailableDates?.length === 0
+            isLoadingDates
               ? getDatesBetween(
                   new Date(),
                   endOfMonth(addMonths(new Date(), 6))
                 )
+              : unavailableDates?.length === 0
+              ? []
               : unavailableDates
           }
         />

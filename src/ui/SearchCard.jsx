@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { useNavigate } from "react-router-dom";
+import { createSearchParams, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { today, getLocalTimeZone } from "@internationalized/date";
 import { HiOutlineUser, HiCalendarDays } from "react-icons/hi2";
@@ -53,12 +53,20 @@ export function SearchCard() {
     checkin,
     checkout,
     guests: { adults, children, pets },
+    hasBreakfast,
   } = useSelector((state) => state.booking);
 
   function handleSubmit() {
     navigate({
       pathname: "/rooms",
-      search: getParamsStr({ checkin, checkout, adults, children, pets }),
+      search: createSearchParams({
+        checkin,
+        checkout,
+        adults,
+        children,
+        pets,
+        hasBreakfast,
+      }).toString(),
     });
   }
 

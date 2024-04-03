@@ -9,6 +9,7 @@ import {
 
 // We want to make this function work for both Date objects and strings (which come from Supabase)
 export const subtractDates = (date1, date2) => {
+  if (!date1 && !date2) return null;
   if (typeof date1 === "string" && typeof date2 == "string") {
     date1 = parseISO(date1);
     date2 = parseISO(date2);

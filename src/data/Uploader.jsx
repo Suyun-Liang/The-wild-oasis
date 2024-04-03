@@ -16,7 +16,10 @@ import { guests } from "./data-guests";
 // };
 
 async function deleteGuests() {
-  const { error } = await supabase.from("guests").delete().gt("id", 0);
+  const { error } = await supabase
+    .from("guests")
+    .delete()
+    .neq("nationalID", "0");
   if (error) console.log(error.message);
 }
 
@@ -46,7 +49,8 @@ async function createBookings() {
     .from("guests")
     .select("id")
     .order("id");
-  const allGuestIds = guestsIds.map((cabin) => cabin.id);
+  const allGuestIds = guestsIds.map((guest) => guest.id);
+  console.log(allGuestIds);
   const { data: cabinsIds } = await supabase
     .from("cabins")
     .select("id")

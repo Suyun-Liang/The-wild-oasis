@@ -1,14 +1,50 @@
+import { CreateGetGuest } from "./apiGuests";
 import supabase, { supabaseUrl } from "./supabase";
 
-export async function signup({ fullName, email, password }) {
-  const { data, error } = await supabase.auth.signUp({
-    email,
-    password,
-    options: { data: { fullName, avatar: "" } },
-  });
+export async function signup({
+  fullName,
+  email,
+  password,
+  role = "user",
+  guestData,
+}) {
+  let query;
+  let data;
 
-  if (error) {
-    throw new Error(error.message);
+  if (role === "admin") {
+    query = supabase.auth.signUp({
+      email,
+      password,
+      options: { data: { fullName, avatar: "", role } },
+    });
+    const { data: adminData, error } = await query;
+    if (error) throw new Error(error.message);
+    data = adminData;
+  }
+
+  if (role === "user") {
+    query = supabase
+      .from("guests")
+      .select("*", { count: "exact", head: true })
+      .eq("nationalID", guestData.nationalID);
+    const { count, error } = await query;
+
+    if (count === 0) {
+      query = supabase.auth.signUp({
+        email,
+        password,
+        options: { data: { fullName, avatar: "", role, guestData } },
+      });
+      const { data: userData, error } = await query;
+      if (error) throw new Error(error.message);
+      data = userData;
+    } else {
+      throw new Error(
+        "user already exist, please log in or use another account"
+      );
+    }
+
+    if (error) throw new Error(error.message);
   }
 
   return data;

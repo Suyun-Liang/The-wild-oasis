@@ -3,7 +3,8 @@ import { createSlice } from "@reduxjs/toolkit";
 const initialState = {
   checkin: null,
   checkout: null,
-  guests: { adults: 1, children: 0, pets: 0 },
+  guests: { adults: 2, children: 0, pets: 0 },
+  hasBreakfast: false,
 };
 
 const bookingSlice = createSlice({
@@ -56,6 +57,12 @@ const bookingSlice = createSlice({
     updatePets(state, action) {
       state.guests.pets = Number(action.payload);
     },
+    addBreakfast(state) {
+      state.hasBreakfast = true;
+    },
+    removeBreakfast(state) {
+      state.hasBreakfast = false;
+    },
   },
 });
 
@@ -71,6 +78,8 @@ export const {
   updateAdults,
   updateChildren,
   updatePets,
+  addBreakfast,
+  removeBreakfast,
 } = bookingSlice.actions;
 
 export default bookingSlice.reducer;
