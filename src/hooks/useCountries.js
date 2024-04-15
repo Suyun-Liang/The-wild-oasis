@@ -10,21 +10,4 @@ export function useCountries() {
     },
   });
   return { countries, isLoading };
-  /*   const [countries, setCountries] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  useEffect(() => {
-    async function getCountries() {
-      try {
-        const { data } = await axios.get(COUNTRIES_URL);
-        const countries = data.map((country) => country.name.common).sort();
-        countries.unshift("");
-        setCountries(countries);
-      } catch (error) {
-        console.error(error.message);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-    getCountries();
-  }, []); */
 }

@@ -11,6 +11,7 @@ import Contactus from "./pages/Contactus";
 import Signup from "./pages/Signup";
 import { default as ClientLogin } from "./pages/Login";
 import { default as ClientBooking } from "./pages/Booking";
+import { default as ClientAccount } from "./pages/AccountSettings";
 
 import AppLayout from "./ui/AppLayout";
 import ProtectedRote from "./ui/ProtectedRote";
@@ -27,6 +28,10 @@ import Checkin from "./pages/employee/Checkin";
 
 import { DarkModeProvider } from "./context/DarkModeContext";
 import AppLayoutClient from "./ui/AppLayoutClient";
+import ProtectedUserRote from "./ui/ProctedUserRoute";
+import PersonalInfo from "./ui/account-settings/PersonalInfo";
+import BookingHistory from "./ui/account-settings/BookingHistory";
+import SettingsLayout from "./ui/account-settings/SettingsLayout";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -55,6 +60,19 @@ function App() {
               <Route path="/signup" element={<Signup />} />
               <Route path="/login" element={<ClientLogin />} />
               <Route path="/book/:roomId" element={<ClientBooking />} />
+
+              <Route element={<ProtectedUserRote />}>
+                <Route path="/account-settings">
+                  <Route index element={<ClientAccount />} />
+                  <Route element={<SettingsLayout />}>
+                    <Route path="personal-info" element={<PersonalInfo />} />
+                    <Route
+                      path="booking-history"
+                      element={<BookingHistory />}
+                    />
+                  </Route>
+                </Route>
+              </Route>
             </Route>
 
             <Route path="/employee">

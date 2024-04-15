@@ -45,6 +45,21 @@ export async function CreateGetGuest(newGuestObj) {
   return { guest: newGuest || guest, isExistGuest: error?.code === "23505" };
 }
 
+export async function getGuest(guestObj) {
+  const { email } = guestObj;
+  console.log(email);
+
+  const { data, error } = await supabase
+    .from("guests")
+    .select("*")
+    .eq("email", email)
+    .single();
+
+  if (error) throw new Error(error.message);
+
+  return data;
+}
+
 export async function deleteGuest(id) {
   const { count, error } = await supabase
     .from("bookings")

@@ -81,11 +81,17 @@ export async function logout() {
   if (error) throw new Error(error.message);
 }
 
-export async function updateCurrentUser({ password, fullName, avatar }) {
+export async function updateCurrentUser({
+  password,
+  fullName,
+  avatar,
+  guestData,
+}) {
   //1.update password or fullName
   let updateData;
   if (password) updateData = { password };
   if (fullName) updateData = { data: { fullName } };
+  if (guestData) updateData = { data: { guestData } };
 
   const { data, error } = await supabase.auth.updateUser(updateData);
 

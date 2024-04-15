@@ -1,13 +1,16 @@
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { HiOutlineBars3, HiUserCircle } from "react-icons/hi2";
+import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
+
 import Modal from "./Modal";
 import Login from "../pages/Login";
 import Signup from "../pages/Signup";
+import SpinnerMini from "./SpinnerMini";
+
 import useUser from "../features/authentication/useUser";
 import Logout from "../features/authentication/Logout";
 import useLogout from "../features/authentication/useLogout";
-import SpinnerMini from "./SpinnerMini";
 
 const Container = styled.div`
   display: flex;
@@ -63,6 +66,7 @@ const Item = styled(DropdownMenu.Item)`
 function MenuUser() {
   const { user, isLoading: isLoadingUser, isAuthenticated } = useUser();
   const { logout, isLoggingOut } = useLogout();
+  const navigate = useNavigate();
 
   return (
     <Modal>
@@ -95,9 +99,24 @@ function MenuUser() {
                 </Modal.Open>
               </>
             ) : (
-              <Item>
-                <div onClick={logout}>Log out</div>
-              </Item>
+              <>
+                <Item>
+                  <div onClick={() => navigate("/account-settings")}>
+                    My Account
+                  </div>
+                </Item>
+                <Item>
+                  <div
+                    onClick={() => {
+                      logout("", {
+                        onSuccess: () => navigate("/", { replace: true }),
+                      });
+                    }}
+                  >
+                    Log out
+                  </div>
+                </Item>
+              </>
             )}
           </Content>
         </DropdownMenu.Portal>

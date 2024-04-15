@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 
 import {
   getBooking,
+  getBookingFrom,
   getUnavailableDatesInCabin,
 } from "../../services/apiBookings";
 
@@ -30,4 +31,13 @@ export function useUnavailableDatesIn(
     queryFn: () => getUnavailableDatesInCabin(cabinId, isDateInterval),
   });
   return { dates, isLoading };
+}
+
+export function useBookingFrom(guestId) {
+  const { data, isLoading } = useQuery({
+    queryKey: ["booking history", guestId],
+    queryFn: () => getBookingFrom(guestId),
+  });
+
+  return { data, isLoading };
 }

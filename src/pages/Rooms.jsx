@@ -13,6 +13,7 @@ import { useMySearchParams } from "../hooks/useMySearchParams";
 const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
+  margin-top: 30px;
   padding-left: 20px;
   padding-right: 20px;
 

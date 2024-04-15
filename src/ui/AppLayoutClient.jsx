@@ -18,7 +18,7 @@ const StyledAppLayout = styled.div`
 function AppLayoutClient() {
   return (
     <StyledAppLayout>
-      <HomeNav />
+      <HomeNav notFromHomePage={true} />
       <Outlet />
     </StyledAppLayout>
   );

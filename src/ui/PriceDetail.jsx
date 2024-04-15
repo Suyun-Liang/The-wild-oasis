@@ -40,7 +40,7 @@ export default function PriceDetail() {
   const cabinPrice = numNights * perNightPrice;
   const numGuests = search.adults === undefined ? 0 : JSON.parse(search.adults);
   const hasBreakfast =
-    search.hasBreakfast === undefined ? false : JSON.parse(search.adults);
+    search.hasBreakfast === undefined ? false : JSON.parse(search.hasBreakfast);
   const breakfastPrice = settings?.breakfastPrice;
 
   const extrasPrice = hasBreakfast ? numNights * numGuests * breakfastPrice : 0;

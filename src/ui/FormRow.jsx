@@ -3,8 +3,12 @@ import { styled } from "styled-components";
 const StyledFormRow = styled.div`
   display: grid;
   align-items: ${(props) =>
-    props.className === "calendar" ? "flex-start" : "center"};
-  grid-template-columns: 24rem 1fr 1.2fr;
+    props.type === "calendar" ? "flex-start" : "center"};
+  grid-template-columns: ${(props) =>
+    props.form === "primary" ? "240px 1fr 1.2fr" : "180px 1fr"};
+  grid-template-rows: ${(props) => props.$isExpand && "1fr 1fr"};
+  align-items: flex-start;
+
   gap: 2.4rem;
 
   padding: 1.2rem 0;
@@ -37,10 +41,17 @@ const Error = styled.span`
   color: var(--color-red-700);
 `;
 
-function FormRow({ label, children, error, type = `primary` }) {
+function FormRow({
+  label,
+  children,
+  error,
+  isExpand,
+  type = "primary",
+  formType = "primary",
+}) {
   return (
-    <StyledFormRow className={type}>
-      {label && <Label htmlFor={children.props?.id}>{label}</Label>}
+    <StyledFormRow type={type} form={formType} $isExpand={isExpand ?? false}>
+      {label && <Label htmlFor={children?.props?.id}>{label}</Label>}
       {children}
       {error && <Error>{error}</Error>}
     </StyledFormRow>

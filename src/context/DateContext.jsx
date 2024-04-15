@@ -7,15 +7,26 @@ const DateContext = createContext();
 
 function DateProvider({ children }) {
   const { search } = useMySearchParams();
-  const initialStart = search?.checkin;
-  const initialEnd = search?.checkout;
+
+  let initialStart =
+    search?.checkin === undefined ? undefined : JSON.stringify(search.checkin);
+  let initialEnd =
+    search?.checkout === undefined
+      ? undefined
+      : JSON.stringify(search?.checkout);
+
+  // stringify Object and parse it back to Object
+  if (initialStart && initialEnd) {
+    initialStart = JSON.parse(initialStart);
+    initialEnd = JSON.parse(initialEnd);
+  }
 
   const [date, setDate] = useState(
     initialStart && initialEnd
       ? { start: parseDate(initialStart), end: parseDate(initialEnd) }
       : null
   );
-
+  console.log(typeof date);
   return (
     <DateContext.Provider value={{ date, setDate }}>
       {children}

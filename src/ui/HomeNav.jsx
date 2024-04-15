@@ -7,7 +7,10 @@ const StyledNav = styled.nav`
   width: 100%;
   padding: 0 3rem;
   z-index: 100;
-
+  background-color: ${(props) =>
+    props.$backgroundcolor === "transparent"
+      ? "transparent"
+      : "var(--color-grey-100)"};
   & img {
     padding: 0.6rem 0;
   }
@@ -35,7 +38,11 @@ const StyledHomeNavLink = styled(NavLink)`
   }
 `;
 
-function HomeNav() {
+StyledNav.defaultProps = {
+  $backgroundcolor: "transparent",
+};
+
+function HomeNav({ notFromHomePage }) {
   function handleMouseHover(opacity) {
     return function (e) {
       if (e.target.matches("a") || e.target.matches("img")) {
@@ -52,7 +59,7 @@ function HomeNav() {
   }
 
   return (
-    <StyledNav>
+    <StyledNav $backgroundcolor={notFromHomePage ? "grey" : "transparent"}>
       <NavList
         onMouseOver={handleMouseHover(0.5)}
         onMouseOut={handleMouseHover(1)}

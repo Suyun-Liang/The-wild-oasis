@@ -8,7 +8,7 @@ import Select from "./SelectSearchCard";
 import DateRangeCalender from "./date_range_calendar/DateRangeCalender";
 import MenuGuests from "./MenuGuests";
 
-import { formatDate, getParamsStr } from "../utils/helpers";
+import { formatDate } from "../utils/helpers";
 import { PopoverTrigger } from "./date_range_calendar/PopoverTrigger";
 import { useMySearchParams } from "../hooks/useMySearchParams";
 
@@ -48,7 +48,6 @@ const Label = styled.div`
 
 export function SearchCard() {
   const navigate = useNavigate();
-
   const {
     checkin,
     checkout,
@@ -56,17 +55,25 @@ export function SearchCard() {
     hasBreakfast,
   } = useSelector((state) => state.booking);
 
+  const globalStates = {
+    checkin,
+    checkout,
+    adults,
+    children,
+    pets,
+    hasBreakfast,
+  };
+
+  const searchParam = Object.keys(globalStates).reduce((acc, key) => {
+    if (!globalStates[key]) return acc;
+    acc[key] = globalStates[key];
+    return acc;
+  }, {});
+
   function handleSubmit() {
     navigate({
       pathname: "/rooms",
-      search: createSearchParams({
-        checkin,
-        checkout,
-        adults,
-        children,
-        pets,
-        hasBreakfast,
-      }).toString(),
+      search: createSearchParams(searchParam).toString(),
     });
   }
 
@@ -97,9 +104,10 @@ export function SearchCard() {
 
 export function CheckinOutCard({ controlledDate }) {
   const { checkin, checkout } = useSelector((state) => state.booking);
+  const { search } = useMySearchParams();
 
-  const checkinLabel = formatDate(checkin, "MMM d");
-  const checkoutLabel = formatDate(checkout, "MMM d");
+  const checkinLabel = formatDate(checkin ?? search?.checkin, "MMM d");
+  const checkoutLabel = formatDate(checkout ?? search?.checkout, "MMM d");
 
   const todayObj = today(getLocalTimeZone());
 

@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import { useForm } from "react-hook-form";
-import { useParams, useSearchParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 
 import Form from "../ui/Form";
 import FormRow from "../ui/FormRow";
@@ -14,13 +14,19 @@ import DateRangeCalender from "../ui/date_range_calendar/DateRangeCalender";
 import { StyledSelect } from "../features/bookings/CreateBookingForm";
 import { useMySearchParams } from "../hooks/useMySearchParams";
 import { useCountries } from "../hooks/useCountries";
+import useUser from "../features/authentication/useUser";
+import useCreateGuest from "../features/bookings/useCreateGuest";
+import useSettings from "../features/settings/useSettings";
+import useDeleteGuest from "../features/bookings/useDeleteGuest";
+import useCreateBooking from "../features/bookings/useCreateBooking";
+import { split } from "lodash";
+
 import {
   formatDate,
   getFullName,
   getISONow,
   getISOStringWithHour,
   isDateInRange,
-  isDateUnavailable,
   isEqualAfterToday,
   subtractDates,
 } from "../utils/helpers";
@@ -29,18 +35,15 @@ import { DateProvider, useDate } from "../context/DateContext";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
 import { getUnavailableDatesInCabin } from "../services/apiBookings";
-import { getLocalTimeZone, parseDate, today } from "@internationalized/date";
 import { getCabin } from "../services/apiCabins";
 import { getFlag } from "../services/apiCountries";
-import useCreateGuest from "../features/bookings/useCreateGuest";
-import useSettings from "../features/settings/useSettings";
-import useDeleteGuest from "../features/bookings/useDeleteGuest";
-import useCreateBooking from "../features/bookings/useCreateBooking";
 import PriceDetail from "../ui/PriceDetail";
 import {
   addBreakfast,
   removeBreakfast,
 } from "../features/bookings/guests/bookingSlice";
+import useGuest from "../features/bookings/useGuest";
+import { getGuest } from "../services/apiGuests";
 
 const Container = styled.div``;
 const Title = styled.h1``;
@@ -90,6 +93,11 @@ function CreateBookingForm() {
   const value = useDate();
   const dispatch = useDispatch();
   const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
+
+  const { user: { user_metadata = {} } = {}, isAuthenticated: isLogin } =
+    useUser();
+  const { fullName = "", email = "", guestData = {} } = user_metadata;
 
   // value of guests are from search params, if not exist, look at global state
   const {
@@ -169,6 +177,23 @@ function CreateBookingForm() {
     }
   }, [checkin, checkout, guestNum, setValue, trigger]);
 
+  useEffect(() => {
+    if (isLogin) {
+      setValue("firstName", split(fullName, " ", 2)[0]);
+      setValue("LastName", split(fullName, " ", 2)[1]);
+      setValue("email", email);
+      setValue("nationalID", guestData.nationalID);
+      setValue("nationality", guestData.nationality);
+    }
+  }, [
+    isLogin,
+    setValue,
+    fullName,
+    email,
+    guestData?.nationalID,
+    guestData?.nationality,
+  ]);
+
   async function onSubmit(data) {
     const {
       firstName,
@@ -184,28 +209,34 @@ function CreateBookingForm() {
       isPaid,
       observations,
     } = data;
+    const cabin = await getCabin(Number(cabinId));
+    const startDate = getISOStringWithHour(rawStartDate);
+    const endDate = getISOStringWithHour(rawEndDate);
+    let submitGuestData;
 
     try {
-      const cabin = await getCabin(Number(cabinId));
-      const countryFlag = await getFlag(nationality);
+      if (!isLogin) {
+        const countryFlag = await getFlag(nationality);
 
-      // 1. Prepare guest data
-      const fullName = getFullName(firstName, lastName);
-      const email = rawEmail.toLowerCase().trim();
-      const nationalID = rawNationalID.trim();
-      const startDate = getISOStringWithHour(rawStartDate);
-      const endDate = getISOStringWithHour(rawEndDate);
+        // 1. Prepare guest data
+        const fullName = getFullName(firstName, lastName);
+        const email = rawEmail.toLowerCase().trim();
+        const nationalID = rawNationalID.trim();
 
-      const guestData = {
-        fullName,
-        email,
-        nationality,
-        nationalID,
-        countryFlag,
-      };
+        submitGuestData = {
+          fullName,
+          email,
+          nationality,
+          nationalID,
+          countryFlag,
+        };
+      } else {
+        submitGuestData = guestData;
+      }
+
       // 1.1 select or create a guest based on their nationalID
       createOrGetGuest(guestData, {
-        onSuccess: ({ id: guestId }) => {
+        onSuccess: ({ guest: { id: guestId } }) => {
           //2. Prepare booking data
           const numNights = subtractDates(endDate, startDate);
           const cabinPrice =
@@ -232,17 +263,16 @@ function CreateBookingForm() {
             totalPrice,
           };
 
-          console.log(bookingData);
-
           //2.2 create booking after guest created/selected successfully, or delete user
-          // createBooking(bookingData, {
-          //   onSuccess: () => {
-          //     reset();
-          //   },
-          //   onError: () => {
-          //     deleteGuest(guestId);
-          //   },
-          // });
+          createBooking(bookingData, {
+            onSuccess: () => {
+              reset();
+              navigate("/");
+            },
+            onError: () => {
+              deleteGuest(guestId);
+            },
+          });
         },
       });
     } catch (error) {
@@ -349,79 +379,89 @@ function CreateBookingForm() {
       {!isLoadingDisabledRange &&
         !(errors?.startDate || errors?.endDate || errors.numGuests) && (
           <>
-            <FormRow label="First Name" error={errors?.firstName?.message}>
-              <Input
-                type="text"
-                id="firstName"
-                disabled={false}
-                {...register("firstName", {
-                  required: "This field is required",
-                  minLength: {
-                    value: 2,
-                    message: "First name should be at least 2 characters",
-                  },
-                })}
-              />
-            </FormRow>
+            {!isLogin && (
+              <>
+                <FormRow label="First Name" error={errors?.firstName?.message}>
+                  <Input
+                    type="text"
+                    id="firstName"
+                    disabled={false}
+                    {...register("firstName", {
+                      required: "This field is required",
+                      minLength: {
+                        value: 2,
+                        message: "First name should be at least 2 characters",
+                      },
+                    })}
+                  />
+                </FormRow>
 
-            <FormRow label="Last Name" error={errors?.lastName?.message}>
-              <Input
-                type="text"
-                id="lastName"
-                disabled={false}
-                {...register("lastName", {
-                  required: "This field is required",
-                  minLength: {
-                    value: 2,
-                    message: "Last name should be at least 2 characters",
-                  },
-                })}
-              />
-            </FormRow>
+                <FormRow label="Last Name" error={errors?.lastName?.message}>
+                  <Input
+                    type="text"
+                    id="lastName"
+                    disabled={false}
+                    {...register("lastName", {
+                      required: "This field is required",
+                      minLength: {
+                        value: 2,
+                        message: "Last name should be at least 2 characters",
+                      },
+                    })}
+                  />
+                </FormRow>
 
-            <FormRow label="Email" error={errors?.email?.message}>
-              <Input
-                type="email"
-                id="email"
-                disabled={false}
-                {...register("email", {
-                  required: "This field is required",
-                  pattern: {
-                    value: /\S+@\S+\.\S+/,
-                    message: "Please provide a valid email address",
-                  },
-                })}
-              />
-            </FormRow>
-            <FormRow label="Nationality" error={errors?.nationality?.message}>
-              <StyledSelect
-                id="nationality"
-                disabled={false}
-                {...register("nationality", {
-                  required: "This field id requied",
-                })}
-              >
-                {countries?.map((country) => (
-                  <option key={country} value={country}>
-                    {country}
-                  </option>
-                ))}
-              </StyledSelect>
-            </FormRow>
-            <FormRow label="Nationality ID" error={errors?.nationalID?.message}>
-              <Input
-                type="text"
-                id="nationalID"
-                disabled={false}
-                {...register("nationalID", {
-                  required: "This field is required",
-                  pattern: {
-                    value: /^[a-zA-Z0-9_]+$/,
-                    message: "Please provide a valid national ID",
-                  },
-                })}
-              />
-            </FormRow>
+                <FormRow label="Email" error={errors?.email?.message}>
+                  <Input
+                    type="email"
+                    id="email"
+                    disabled={false}
+                    {...register("email", {
+                      required: "This field is required",
+                      pattern: {
+                        value: /\S+@\S+\.\S+/,
+                        message: "Please provide a valid email address",
+                      },
+                    })}
+                  />
+                </FormRow>
+                <FormRow
+                  label="Nationality"
+                  error={errors?.nationality?.message}
+                >
+                  <StyledSelect
+                    id="nationality"
+                    disabled={false}
+                    {...register("nationality", {
+                      required: "This field id requied",
+                    })}
+                  >
+                    {countries?.map((country) => (
+                      <option key={country} value={country}>
+                        {country}
+                      </option>
+                    ))}
+                  </StyledSelect>
+                </FormRow>
+                <FormRow
+                  label="Nationality ID"
+                  error={errors?.nationalID?.message}
+                >
+                  <Input
+                    type="text"
+                    id="nationalID"
+                    disabled={false}
+                    {...register("nationalID", {
+                      required: "This field is required",
+                      pattern: {
+                        value: /^[a-zA-Z0-9_]+$/,
+                        message: "Please provide a valid national ID",
+                      },
+                    })}
+                  />
+                </FormRow>
+              </>
+            )}
 
             <FormRow label="Note" error={errors?.observations?.message}>
               <Input

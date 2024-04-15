@@ -56,6 +56,18 @@ export async function getBooking(id) {
   return data;
 }
 
+export async function getBookingFrom(guestId) {
+  if (!guestId) return;
+  const { data, error } = await supabase
+    .from("bookings")
+    .select("*, cabins(*)")
+    .eq("guestId", guestId);
+
+  if (error) throw new Error("Booking not found");
+
+  return data;
+}
+
 export async function getCabinBooking(cabinId, { isAfterToday = false } = {}) {
   if (!cabinId) return;
 
