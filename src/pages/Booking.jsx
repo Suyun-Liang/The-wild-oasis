@@ -162,6 +162,7 @@ function CreateBookingForm() {
     if (checkin && checkout) {
       setValue("startDate", checkin);
       setValue("endDate", checkout);
+      trigger(["startDate", "endDate"]);
     }
   }, [checkin, checkout, guestNum, setValue, trigger]);
 
@@ -223,7 +224,7 @@ function CreateBookingForm() {
       }
 
       // 1.1 select or create a guest based on their nationalID
-      createOrGetGuest(guestData, {
+      createOrGetGuest(submitGuestData, {
         onSuccess: ({ guest: { id: guestId } }) => {
           //2. Prepare booking data
           const numNights = subtractDates(endDate, startDate);
