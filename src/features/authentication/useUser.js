@@ -8,7 +8,7 @@ export default function useUser() {
   });
 
   return {
-    user,
+    user: user ?? {},
     isLoading,
     isAuthenticated: user?.role === "authenticated",
     isAdmin: user?.user_metadata?.role === "admin",

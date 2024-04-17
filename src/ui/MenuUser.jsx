@@ -101,8 +101,8 @@ function MenuUser() {
 
             <AvatarRoot>
               <Avatar.Image
-                src={user?.user_metadata.avatar}
-                alt={`avatar of user ${user?.user_metadata.fullName}`}
+                src={user?.user_metadata?.avatar}
+                alt={`avatar of user ${user?.user_metadata?.fullName}`}
               />
               <Avatar.Fallback delayMs={600}>
                 <HiUserCircle />
