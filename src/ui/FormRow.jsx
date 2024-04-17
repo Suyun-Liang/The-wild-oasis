@@ -7,7 +7,6 @@ const StyledFormRow = styled.div`
   grid-template-columns: ${(props) =>
     props.form === "primary" ? "240px 1fr 1.2fr" : "180px 1fr"};
   grid-template-rows: ${(props) => props.$isExpand && "1fr 1fr"};
-  align-items: flex-start;
 
   gap: 2.4rem;
 

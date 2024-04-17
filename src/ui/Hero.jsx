@@ -4,9 +4,6 @@ import LoadingCards from "./LoadingCards.jsx";
 const ImgContainer = styled.div`
   max-width: 130rem;
   margin: 0 auto;
-  padding-top: 24px;
-  padding-left: 12px;
-  padding-right: 12px;
 `;
 
 const Img = styled.img`

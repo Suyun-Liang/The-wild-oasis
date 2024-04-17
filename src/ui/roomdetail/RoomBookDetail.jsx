@@ -7,8 +7,7 @@ import { useDate } from "../../context/DateContext.jsx";
 
 const BookDetails = styled.div`
   display: flex;
-
-  gap: 30px;
+  justify-content: space-between;
 `;
 
 export function RoomBookDetail({ cabin }) {
@@ -16,7 +15,13 @@ export function RoomBookDetail({ cabin }) {
 
   return (
     <BookDetails>
-      <DateRangeCalendar aria-label="date calendar" controlledDate={value} />
+      <DateRangeCalendar
+        aria-label="date calendar"
+        visibleDuration={{ months: 2 }}
+        controlledDate={value}
+        $noPadding={true}
+      />
+
       <RoomSidebar cabin={cabin} controlledDate={value} />
     </BookDetails>
   );

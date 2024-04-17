@@ -1,9 +1,11 @@
+import styled from "styled-components";
 import { useParams } from "react-router-dom";
+import { useSelector } from "react-redux";
+
+import useSettings from "../features/settings/useSettings";
 import useCabin from "../features/cabins/useCabin";
 import { subtractDates } from "../utils/helpers";
 import { useMySearchParams } from "../hooks/useMySearchParams";
-import styled from "styled-components";
-import useSettings from "../features/settings/useSettings";
 
 const Container = styled.div`
   display: flex;
@@ -34,11 +36,13 @@ export default function PriceDetail() {
   const { isLoading: isLoadingCabin, cabin } = useCabin(roomId);
   const { isLoading: isLoadingSettings, settings } = useSettings();
   const { search } = useMySearchParams();
+  const { adults: stateAdults } = useSelector((state) => state.booking.guests);
 
   const numNights = subtractDates(search.checkout, search.checkin);
   const perNightPrice = cabin?.regularPrice - cabin?.discount;
   const cabinPrice = numNights * perNightPrice;
-  const numGuests = search.adults === undefined ? 0 : JSON.parse(search.adults);
+  const numGuests =
+    search.adults === undefined ? stateAdults : JSON.parse(search.adults);
   const hasBreakfast =
     search.hasBreakfast === undefined ? false : JSON.parse(search.hasBreakfast);
   const breakfastPrice = settings?.breakfastPrice;
@@ -52,7 +56,7 @@ export default function PriceDetail() {
             €{perNightPrice} &times;
             {`${numNights} ${numNights > 1 ? "nights" : "night"}`}
           </span>
-          <span>{String(cabinPrice)}</span>
+          <span>€{String(cabinPrice)}</span>
         </Row>
         {hasBreakfast && (
           <Row>
@@ -61,11 +65,11 @@ export default function PriceDetail() {
               {`${numNights} ${numNights > 1 ? "nights" : "night"}`} &times;
               {`${numGuests} ${numGuests > 1 ? "adults" : "adult"}`}
             </span>
-            <span>{String(extrasPrice)}</span>
+            <span>€{String(extrasPrice)}</span>
           </Row>
         )}
         <Row>
-          <div>Total: {cabinPrice + extrasPrice}</div>
+          <div>Total: €{cabinPrice + extrasPrice}</div>
         </Row>
       </Container>
     )

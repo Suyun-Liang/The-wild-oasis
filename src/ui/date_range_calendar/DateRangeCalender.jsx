@@ -22,8 +22,7 @@ import useSettings from "../../features/settings/useSettings";
 const StyledRangeCalendar = styled(RangeCalendar)`
   width: fit-content;
   max-width: 100%;
-  padding: 1.25rem 2.25rem;
-
+  padding: ${(props) => (props?.$noPadding ? "0" : "1.25rem 2.25rem")};
   & > header {
     display: flex;
     align-items: center;
@@ -131,6 +130,10 @@ const Body = styled.div`
     gap: 35px;
   }
 `;
+
+StyledCalendarCell.defaultProps = {
+  $noPadding: false,
+};
 
 function DateRangeCalender(props) {
   const [date, setDate] = useState(null);

@@ -1,20 +1,42 @@
 import styled from "styled-components";
+import * as Avatar from "@radix-ui/react-avatar";
+import { FormProvider, useForm, useFormContext } from "react-hook-form";
+
 import FormRow from "../FormRow";
+import Spinner from "../Spinner";
 import useUser from "../../features/authentication/useUser";
 import EditToggle, { useEditToggle } from "../EditToggle";
-import { FormProvider, useForm, useFormContext } from "react-hook-form";
+
 import { useCountries } from "../../hooks/useCountries";
 import useUpdateUser from "../../features/authentication/useUpdateUser";
 import { getFlag } from "../../services/apiCountries";
-import Spinner from "../Spinner";
+import { HiUserCircle } from "react-icons/hi2";
+import Modal, { useModal } from "../Modal";
+import FileInput from "../FileInput";
+import { useState } from "react";
+
+const Container = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+`;
+const Hearder = styled.div`
+  display: flex;
+  align-items: center;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--color-grey-300);
+`;
+const PageTitle = styled.div`
+  flex-grow: 1;
+`;
 
 const Title = styled.h1``;
+const Desc = styled.div``;
 const Main = styled.main``;
 const Text = styled.div``;
 const MyForm = styled.form``;
 
 const EditWrapper = styled.div`
-  width: 95%;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -32,24 +54,33 @@ function PersonalInfo() {
       email: userData.email,
       nationality: userData?.guestData?.nationality,
       nationalID: userData?.guestData?.nationalID,
+      avatar: userData?.avatar,
     },
   });
 
   return (
-    <div>
-      <Title>Personal details</Title>
-      <Main>
-        {isLoading ? (
-          <Spinner />
-        ) : (
-          <FormProvider {...methods}>
-            <EditToggle>
-              <CreatePersonalInfoForm data={userData} />
-            </EditToggle>
-          </FormProvider>
-        )}
-      </Main>
-    </div>
+    <Container>
+      <FormProvider {...methods}>
+        <Modal>
+          <Hearder>
+            <PageTitle>
+              <Title>Personal details</Title>
+              <Desc>Update your information </Desc>
+            </PageTitle>
+            <SettingAvatar />
+          </Hearder>
+          <Main>
+            {isLoading ? (
+              <Spinner />
+            ) : (
+              <EditToggle>
+                <CreatePersonalInfoForm data={userData} />
+              </EditToggle>
+            )}
+          </Main>
+        </Modal>
+      </FormProvider>
+    </Container>
   );
 }
 
@@ -59,9 +90,11 @@ function CreatePersonalInfoForm({ data }) {
   const { dirtyFields } = methods.formState;
   const { isLoading: isLoadingCountries, countries } = useCountries();
   const { updateUser, isUpdating } = useUpdateUser();
+  const { close: closeModal } = useModal();
 
   async function onSubmit(data) {
-    const { fullName, email, nationality, nationalID } = data;
+    let { fullName, email, nationality, nationalID, avatar } = data;
+
     try {
       // update fullName
       if (dirtyFields?.fullName) {
@@ -110,6 +143,22 @@ function CreatePersonalInfoForm({ data }) {
                 defaultValue: nationalID,
               });
               close();
+            },
+          }
+        );
+      }
+      // update avatar
+      if (dirtyFields?.avatar) {
+        avatar = avatar[0];
+        updateUser(
+          { fullName, avatar },
+          {
+            onSuccess: ({ user }) => {
+              methods.resetField("avatar", {
+                defaultValue: user.user_metadata.avatar,
+              });
+              console.log(user);
+              closeModal();
             },
           }
         );
@@ -225,6 +274,110 @@ function SettingRow({ label, data, editButton, name }) {
         {editButton}
       </EditWrapper>
     </FormRow>
+  );
+}
+
+const StyledsettingAvatar = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 64px;
+  height: 86px;
+  padding: 6px 3px;
+
+  & > div {
+    line-height: 1.2;
+  }
+
+  &:hover,
+  &:focus {
+    background-color: var(--color-grey-200);
+    border-radius: 8px;
+  }
+`;
+
+const AvatarRoot = styled(Avatar.Root)`
+  display: block;
+  width: 56px;
+  height: 56px;
+  border-radius: 100%;
+  & svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  & img {
+    display: block;
+    object-fit: cover;
+    width: 100%;
+    height: 100%;
+    border-radius: inherit;
+  }
+`;
+
+function SettingAvatar() {
+  const {
+    formState: { defaultValues },
+  } = useFormContext();
+  return (
+    <>
+      <Modal.Open opens="avatarSetting">
+        <StyledsettingAvatar>
+          <AvatarRoot>
+            <Avatar.Image
+              src={defaultValues.avatar}
+              alt={`avatar of user ${defaultValues.fullName}`}
+            />
+            <Avatar.Fallback delayMs={600}>
+              <HiUserCircle />
+            </Avatar.Fallback>
+          </AvatarRoot>
+          <div>Edit</div>
+        </StyledsettingAvatar>
+      </Modal.Open>
+
+      <Modal.Window name="avatarSetting">
+        <AvatarSetting />
+      </Modal.Window>
+    </>
+  );
+}
+
+const SubmitButton = styled.button`
+  background: none;
+  outline: inherit;
+  background-color: var(--color-grey-400);
+  color: var(--color-grey-100);
+  border: none;
+  border-radius: 8px;
+  width: 70px;
+  height: 35px;
+`;
+
+const ButtonWrapper = styled.div`
+  display: flex;
+  justify-content: end;
+`;
+
+function AvatarSetting() {
+  const { register } = useFormContext();
+  return (
+    <div>
+      <h2>Select an image to upload</h2>
+      <FormRow label="Avatar" formType="setting-form">
+        <FileInput {...register("avatar")} accept="image/*" />
+      </FormRow>
+      <ButtonWrapper>
+        <SubmitButton
+          form="personal-info"
+          type="submit"
+          className="submit-button"
+        >
+          save
+        </SubmitButton>
+      </ButtonWrapper>
+    </div>
   );
 }
 

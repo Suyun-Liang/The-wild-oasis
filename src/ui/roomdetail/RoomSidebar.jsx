@@ -10,6 +10,10 @@ import AddBreakFast from "../AddBreakFast";
 const Container = styled.div`
   display: flex;
   flex-direction: column;
+  gap: 8px;
+
+  width: max-content;
+  padding-right: 15px;
 `;
 
 const PriceTitle = styled.div`

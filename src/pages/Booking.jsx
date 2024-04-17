@@ -489,14 +489,6 @@ function CreateBookingForm() {
             </FormRow>
 
             <FormRow>
-              <Button
-                type="button"
-                $variation="secondary"
-                className="modal_btn"
-                onClick={reset}
-              >
-                Reset
-              </Button>
               <Button className="modal_btn">Submit</Button>
             </FormRow>
           </>

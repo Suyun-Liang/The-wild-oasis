@@ -2,8 +2,13 @@ import styled from "styled-components";
 import { HiOutlineChevronDown } from "react-icons/hi2";
 
 const StyledSelect = styled.div`
-  width: ${(props) => (props.$secondary ? "16.78rem" : "18.78rem")};
-  height: 6.5rem;
+  width: ${(props) =>
+    props.$secondary
+      ? "167.8px"
+      : props?.$doubleWidth
+      ? "cal(187.8px * 2)"
+      : "187.8px"};
+  height: 65px;
 
   display: flex;
   justify-content: ${(props) =>
@@ -28,7 +33,7 @@ const StyledSelect = styled.div`
   }
 `;
 
-function Select({ label, onClick, as = "select" }) {
+function Select({ label, onClick, as = "select", doubleWidth }) {
   if (as === "button") {
     return (
       <StyledSelect $secondary as="button" onClick={onClick}>
@@ -37,7 +42,7 @@ function Select({ label, onClick, as = "select" }) {
     );
   }
   return (
-    <StyledSelect>
+    <StyledSelect $doubleWidth={doubleWidth}>
       <span>{!label ? "Add date" : label}</span>
       <span>
         <HiOutlineChevronDown />

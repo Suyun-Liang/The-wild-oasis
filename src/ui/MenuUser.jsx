@@ -2,6 +2,7 @@ import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { HiOutlineBars3, HiUserCircle } from "react-icons/hi2";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
+import * as Avatar from "@radix-ui/react-avatar";
 
 import Modal from "./Modal";
 import Login from "../pages/Login";
@@ -32,14 +33,14 @@ const Container = styled.div`
 `;
 
 const SvgBox = styled.div`
-  width: ${(props) => (props.$size === "small" ? "16px" : "32px")};
-  height: ${(props) => (props.$size === "small" ? "16px" : "32px")};
+  width: 16px;
+  height: 16px;
 
   & svg {
     display: block;
     width: 100%;
     height: 100%;
-    stroke-width: ${(props) => (props.$size === "small" ? "2.25" : "0")};
+    stroke-width: 2.25;
   }
 `;
 
@@ -63,6 +64,27 @@ const Item = styled(DropdownMenu.Item)`
   }
 `;
 
+const AvatarRoot = styled(Avatar.Root)`
+  display: block;
+  width: 32px;
+  height: 32px;
+  border-radius: 100%;
+
+  & svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  & img {
+    display: block;
+    object-fit: cover;
+    width: 100%;
+    height: 100%;
+    border-radius: inherit;
+  }
+`;
+
 function MenuUser() {
   const { user, isLoading: isLoadingUser, isAuthenticated } = useUser();
   const { logout, isLoggingOut } = useLogout();
@@ -73,12 +95,19 @@ function MenuUser() {
       <DropdownMenu.Root modal={false}>
         <DropdownMenu.Trigger asChild>
           <Container>
-            <SvgBox $size="small">
+            <SvgBox>
               <HiOutlineBars3 />
             </SvgBox>
-            <SvgBox>
-              <HiUserCircle />
-            </SvgBox>
+
+            <AvatarRoot>
+              <Avatar.Image
+                src={user?.user_metadata.avatar}
+                alt={`avatar of user ${user?.user_metadata.fullName}`}
+              />
+              <Avatar.Fallback delayMs={600}>
+                <HiUserCircle />
+              </Avatar.Fallback>
+            </AvatarRoot>
           </Container>
         </DropdownMenu.Trigger>
 

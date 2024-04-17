@@ -6,14 +6,10 @@ import MenuUser from "./MenuUser";
 const StyledNav = styled.nav`
   width: 100%;
   padding: 0 3rem;
-  z-index: 100;
   background-color: ${(props) =>
     props.$backgroundcolor === "transparent"
       ? "transparent"
       : "var(--color-grey-100)"};
-  & img {
-    padding: 0.6rem 0;
-  }
 `;
 const NavList = styled.ul`
   display: flex;
@@ -36,6 +32,10 @@ const StyledHomeNavLink = styled(NavLink)`
   &.active:link,
   &.active:visited {
   }
+
+  & img {
+    padding: 0.6rem 0;
+  }
 `;
 
 StyledNav.defaultProps = {
@@ -45,7 +45,7 @@ StyledNav.defaultProps = {
 function HomeNav({ notFromHomePage }) {
   function handleMouseHover(opacity) {
     return function (e) {
-      if (e.target.matches("a") || e.target.matches("img")) {
+      if (e.target.matches("a") || e.target.matches(".logo")) {
         const selectedLink = e.target.closest("a");
         const links = selectedLink.closest("ul").querySelectorAll("a");
 

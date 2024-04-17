@@ -98,6 +98,15 @@ function Window({ children, name }) {
   );
 }
 
+export function useModal() {
+  const value = useContext(ModalContext);
+
+  if (value === undefined)
+    return new Error("ModalContext was used outside of ModalContextProvider");
+
+  return value;
+}
+
 Modal.Open = Open;
 Modal.Window = Window;
 

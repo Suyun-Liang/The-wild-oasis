@@ -26,7 +26,6 @@ function DateProvider({ children }) {
       ? { start: parseDate(initialStart), end: parseDate(initialEnd) }
       : null
   );
-  console.log(typeof date);
   return (
     <DateContext.Provider value={{ date, setDate }}>
       {children}

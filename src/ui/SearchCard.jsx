@@ -128,7 +128,7 @@ export function CheckinOutCard({ controlledDate }) {
   );
 }
 
-export function GuestCard() {
+export function GuestCard({ doubleWidth }) {
   const {
     adults: stateAdults,
     children: stateChildren,
@@ -154,7 +154,7 @@ export function GuestCard() {
 
   return (
     <PopoverTrigger element={<MenuGuests />} type="button">
-      <Select label={guestLabel} />
+      <Select label={guestLabel} doubleWidth={doubleWidth} />
     </PopoverTrigger>
   );
 }
