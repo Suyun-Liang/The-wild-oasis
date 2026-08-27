@@ -15,7 +15,7 @@ function CreateCabinForm() {
   const { register, handleSubmit, reset, getValues, formState } = useForm();
   const { errors } = formState;
   const queryClient = useQueryClient();
-  const { isLoading: isCreating, mutate } = useMutation({
+  const { isPending: isCreating, mutate } = useMutation({
     mutationFn: createCabin,
     onSuccess: () => {
       toast.success("New cabin successfully created");

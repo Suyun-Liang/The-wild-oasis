@@ -4,7 +4,7 @@ import toast from "react-hot-toast";
 
 export default function useCheckout() {
   const queryClient = useQueryClient();
-  const { mutate: checkout, isLoading: isCheckingOut } = useMutation({
+  const { mutate: checkout, isPending: isCheckingOut } = useMutation({
     mutationFn: (bookingId) =>
       updateBooking(bookingId, {
         status: "checked-out",

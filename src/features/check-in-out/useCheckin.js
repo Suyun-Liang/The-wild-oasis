@@ -6,7 +6,7 @@ import toast from "react-hot-toast";
 export default function useCheckin() {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-  const { mutate: checkin, isLoading: isCheckingIn } = useMutation({
+  const { mutate: checkin, isPending: isCheckingIn } = useMutation({
     mutationFn: ({ bookingId, breakfast = {} }) =>
       updateBooking(bookingId, {
         isPaid: true,

@@ -3,7 +3,7 @@ import { CreateGetGuest } from "../../services/apiGuests";
 import toast from "react-hot-toast";
 
 export default function useCreateGuest() {
-  const { mutate: createOrGetGuest, isLoading: isCreatingGuest } = useMutation({
+  const { mutate: createOrGetGuest, isPending: isCreatingGuest } = useMutation({
     mutationFn: CreateGetGuest,
     onSuccess: (data) => {
       if (!data.isExistGuest) {

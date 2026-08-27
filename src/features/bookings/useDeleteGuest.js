@@ -4,7 +4,7 @@ import { deleteGuest as deleteGuestApi } from "../../services/apiGuests";
 import toast from "react-hot-toast";
 
 export default function useDeleteGuest() {
-  const { mutate: deleteGuest, isLoading: isDeletingGuest } = useMutation({
+  const { mutate: deleteGuest, isPending: isDeletingGuest } = useMutation({
     mutationFn: deleteGuestApi,
     onError: (err) => {
       toast.error(err.message);

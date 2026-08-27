@@ -5,7 +5,7 @@ import { createBooking as createBookingApi } from "../../services/apiBookings";
 
 export default function useCreateBooking() {
   const queryClient = useQueryClient();
-  const { mutate: createBooking, isLoading: isCreatingBooking } = useMutation({
+  const { mutate: createBooking, isPending: isCreatingBooking } = useMutation({
     mutationFn: createBookingApi,
     onSuccess: (data) => {
       toast.success(`Booking ID:${data.id} successfully created`);

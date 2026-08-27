@@ -3,7 +3,7 @@ import { logout as logoutApi } from "../../services/apiAuth";
 
 export default function useLogout() {
   const queryClient = useQueryClient();
-  const { mutate: logout, isLoading: isLoggingOut } = useMutation({
+  const { mutate: logout, isPending: isLoggingOut } = useMutation({
     mutationFn: logoutApi,
     onSuccess: () => {
       queryClient.removeQueries();
